@@ -1,0 +1,71 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider files
+.idea/
+*.sln.iml
+
+# Build outputs
+*.dll
+*.exe
+*.pdb
+*.mdb
+
+# NuGet
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# User-specific files
+*.rsuser
+
+# MSBuild Binary and Structured Log
+*.binlog
+
+# Publish output
+publish/
+
+# Local config
+local.settings.json
+
+# Tessdata (user must download)
+ArcRaidersOverlay/Data/tessdata/*.traineddata
+
+# Map images (user must provide)
+ArcRaidersOverlay/Data/maps/*.png
+ArcRaidersOverlay/Data/maps/*.jpg
+!ArcRaidersOverlay/Data/maps/README.md
+
+# App icon (optional)
+ArcRaidersOverlay/app.ico

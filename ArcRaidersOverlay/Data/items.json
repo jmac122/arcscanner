@@ -1,0 +1,321 @@
+[
+  {
+    "name": "Scrap Metal",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 50,
+    "description": "Basic salvaged metal, useful for crafting and repairs.",
+    "weight": 0.5,
+    "stackSize": 100,
+    "recycleOutputs": {
+      "Iron": 2,
+      "Carbon": 1
+    },
+    "projectUses": [
+      "Basic Repairs",
+      "Metal Plating",
+      "Ammo Crafting"
+    ],
+    "foundIn": [
+      "Dread Canyon",
+      "Blackstone Quarry",
+      "All Maps"
+    ]
+  },
+  {
+    "name": "Circuit Board",
+    "category": "Component",
+    "rarity": "Uncommon",
+    "value": 250,
+    "description": "Salvaged electronics, essential for tech upgrades.",
+    "weight": 0.2,
+    "stackSize": 50,
+    "recycleOutputs": {
+      "Copper": 3,
+      "Silicon": 2,
+      "Gold": 1
+    },
+    "projectUses": [
+      "Scanner Upgrade",
+      "Comm Device",
+      "Drone Repair"
+    ],
+    "foundIn": [
+      "Tech Facilities",
+      "Supply Drops"
+    ]
+  },
+  {
+    "name": "Energy Cell",
+    "category": "Component",
+    "rarity": "Uncommon",
+    "value": 300,
+    "description": "Portable power source for various equipment.",
+    "weight": 0.8,
+    "stackSize": 20,
+    "recycleOutputs": {
+      "Lithium": 2,
+      "Copper": 2
+    },
+    "projectUses": [
+      "Shield Generator",
+      "Flashlight Upgrade",
+      "Power Tools"
+    ],
+    "foundIn": [
+      "Power Stations",
+      "ARC Facilities"
+    ]
+  },
+  {
+    "name": "Polymer Sheet",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 75,
+    "description": "Flexible synthetic material for armor and construction.",
+    "weight": 0.3,
+    "stackSize": 100,
+    "recycleOutputs": {
+      "Plastic": 3,
+      "Carbon Fiber": 1
+    },
+    "projectUses": [
+      "Armor Crafting",
+      "Container Repair",
+      "Insulation"
+    ],
+    "foundIn": [
+      "Industrial Sites",
+      "All Maps"
+    ]
+  },
+  {
+    "name": "Titan Core Fragment",
+    "category": "Component",
+    "rarity": "Epic",
+    "value": 2500,
+    "description": "A fragment from an ARC Titan's power core. Extremely valuable.",
+    "weight": 2.0,
+    "stackSize": 5,
+    "recycleOutputs": {
+      "Exotic Alloy": 1,
+      "Energy Crystal": 2,
+      "Titanium": 5
+    },
+    "projectUses": [
+      "Advanced Weapons",
+      "Titan Armor",
+      "Experimental Tech"
+    ],
+    "foundIn": [
+      "Titan Boss",
+      "High-Security Areas"
+    ]
+  },
+  {
+    "name": "Medical Supplies",
+    "category": "Consumable",
+    "rarity": "Common",
+    "value": 100,
+    "description": "Basic medical kit for treating injuries.",
+    "weight": 0.5,
+    "stackSize": 10,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "foundIn": [
+      "Medical Facilities",
+      "Supply Crates",
+      "All Maps"
+    ]
+  },
+  {
+    "name": "Combat Stim",
+    "category": "Consumable",
+    "rarity": "Rare",
+    "value": 500,
+    "description": "Adrenaline booster that temporarily enhances combat abilities.",
+    "weight": 0.2,
+    "stackSize": 5,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "foundIn": [
+      "Military Sites",
+      "Supply Drops"
+    ]
+  },
+  {
+    "name": "Fiber Optic Cable",
+    "category": "Material",
+    "rarity": "Uncommon",
+    "value": 150,
+    "description": "High-quality cable for electronics and communications.",
+    "weight": 0.2,
+    "stackSize": 50,
+    "recycleOutputs": {
+      "Glass": 2,
+      "Silicon": 1
+    },
+    "projectUses": [
+      "Comm Upgrades",
+      "Scanner Enhancement",
+      "Network Hub"
+    ],
+    "foundIn": [
+      "Communication Towers",
+      "Tech Buildings"
+    ]
+  },
+  {
+    "name": "Exotic Alloy",
+    "category": "Material",
+    "rarity": "Legendary",
+    "value": 5000,
+    "description": "Extremely rare alien metal with unique properties.",
+    "weight": 1.5,
+    "stackSize": 10,
+    "recycleOutputs": {
+      "Titanium": 5,
+      "Unknown Element": 1
+    },
+    "projectUses": [
+      "Legendary Weapons",
+      "Advanced Armor",
+      "Research Projects"
+    ],
+    "foundIn": [
+      "ARC Crash Sites",
+      "Titan Boss"
+    ]
+  },
+  {
+    "name": "Gunpowder",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 80,
+    "description": "Basic propellant for ammunition crafting.",
+    "weight": 0.3,
+    "stackSize": 100,
+    "recycleOutputs": {
+      "Sulfur": 2,
+      "Carbon": 1,
+      "Potassium": 1
+    },
+    "projectUses": [
+      "Ammo Crafting",
+      "Explosives",
+      "Grenades"
+    ],
+    "foundIn": [
+      "Military Sites",
+      "Supply Crates"
+    ]
+  },
+  {
+    "name": "Kevlar Fiber",
+    "category": "Material",
+    "rarity": "Rare",
+    "value": 400,
+    "description": "High-strength fiber for advanced armor construction.",
+    "weight": 0.4,
+    "stackSize": 30,
+    "recycleOutputs": {
+      "Synthetic Fiber": 3,
+      "Carbon Fiber": 2
+    },
+    "projectUses": [
+      "Heavy Armor",
+      "Tactical Vest",
+      "Reinforced Container"
+    ],
+    "foundIn": [
+      "Military Bases",
+      "Supply Drops"
+    ]
+  },
+  {
+    "name": "Water Filter",
+    "category": "Component",
+    "rarity": "Common",
+    "value": 120,
+    "description": "Purification filter for clean water production.",
+    "weight": 0.6,
+    "stackSize": 20,
+    "recycleOutputs": {
+      "Charcoal": 2,
+      "Plastic": 1
+    },
+    "projectUses": [
+      "Water Purifier",
+      "Base Upgrade",
+      "Survival Kit"
+    ],
+    "foundIn": [
+      "Residential Areas",
+      "Water Treatment"
+    ]
+  },
+  {
+    "name": "Fuel Canister",
+    "category": "Consumable",
+    "rarity": "Uncommon",
+    "value": 200,
+    "description": "Portable fuel for vehicles and generators.",
+    "weight": 2.0,
+    "stackSize": 5,
+    "recycleOutputs": null,
+    "projectUses": [
+      "Vehicle Fuel",
+      "Generator Power"
+    ],
+    "foundIn": [
+      "Gas Stations",
+      "Industrial Sites"
+    ]
+  },
+  {
+    "name": "Biometric Scanner",
+    "category": "Component",
+    "rarity": "Rare",
+    "value": 800,
+    "description": "Advanced scanner for accessing secured areas.",
+    "weight": 0.5,
+    "stackSize": 5,
+    "recycleOutputs": {
+      "Circuit Board": 2,
+      "Lens": 1,
+      "Gold": 2
+    },
+    "projectUses": [
+      "Security Bypass",
+      "ID Scanner",
+      "Recon Drone"
+    ],
+    "foundIn": [
+      "Security Stations",
+      "ARC Facilities"
+    ]
+  },
+  {
+    "name": "Military-Grade Optic",
+    "category": "Component",
+    "rarity": "Epic",
+    "value": 1500,
+    "description": "High-quality optical component for weapon scopes.",
+    "weight": 0.3,
+    "stackSize": 5,
+    "recycleOutputs": {
+      "Glass": 3,
+      "Titanium": 2,
+      "Circuit Board": 1
+    },
+    "projectUses": [
+      "Sniper Scope",
+      "Night Vision",
+      "Thermal Sight"
+    ],
+    "foundIn": [
+      "Military Armory",
+      "Elite Supply Drops"
+    ]
+  }
+]

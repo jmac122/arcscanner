@@ -70,3 +70,5 @@ ArcRaidersOverlay/Data/maps/*.jpg
 
 # App icon (optional)
 ArcRaidersOverlay/app.ico
+.vscode/launch.json
+.vscode/tasks.json

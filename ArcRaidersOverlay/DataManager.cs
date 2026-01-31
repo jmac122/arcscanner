@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.RegularExpressions;
 using ArcRaidersOverlay.Models;
 using Newtonsoft.Json;
@@ -79,6 +80,109 @@ public class DataManager
 
         // Try fuzzy match
         return FuzzyMatch(name);
+    }
+
+    /// <summary>
+    /// Gets the total number of items in the database.
+    /// </summary>
+    public int ItemCount => _itemNames.Count;
+
+    /// <summary>
+    /// Patterns that indicate a line is NOT an item name (stats, UI elements, etc.)
+    /// </summary>
+    private static readonly string[] NonItemPatterns = new[]
+    {
+        "durability", "ammo type", "magazine", "firing mode", "armor penetration",
+        "damage", "accuracy", "recoil", "fire rate", "range", "weight",
+        "category", "rarity", "common", "uncommon", "rare", "epic", "legendary",
+        "special", "actions", "stash", "loadout", "equipment", "backpack",
+        "quick use", "augmented", "slots", "ends in", "starts in"
+    };
+
+    /// <summary>
+    /// Tries to find the best item match from multiple OCR text lines.
+    /// Filters out non-item lines (stats, UI elements) and returns the best fuzzy match.
+    /// </summary>
+    public (Item? item, string matchedLine, double confidence) GetBestItemMatch(string ocrText)
+    {
+        if (string.IsNullOrWhiteSpace(ocrText))
+            return (null, string.Empty, 0);
+
+        var lines = ocrText.Split('\n')
+            .Select(l => l.Trim())
+            .Where(l => !string.IsNullOrWhiteSpace(l))
+            .Where(l => l.Length >= 3)  // Skip very short lines
+            .Where(IsLikelyItemName)    // Filter out stat lines
+            .ToArray();
+
+        if (lines.Length == 0)
+            return (null, string.Empty, 0);
+
+        Item? bestItem = null;
+        string bestLine = string.Empty;
+        double bestConfidence = 0;
+
+        foreach (var line in lines)
+        {
+            // Try exact match first
+            if (_items.TryGetValue(line, out var exactItem))
+            {
+                return (exactItem, line, 1.0);  // Perfect match
+            }
+
+            // Try normalized match
+            var normalized = NormalizeName(line);
+            if (_items.TryGetValue(normalized, out var normalizedItem))
+            {
+                return (normalizedItem, line, 0.95);  // Near-perfect match
+            }
+
+            // Try fuzzy match - find best score for this line
+            foreach (var itemName in _itemNames)
+            {
+                var normalizedItemName = NormalizeName(itemName);
+                var score = CalculateSimilarity(normalized, normalizedItemName);
+
+                if (score > bestConfidence && score > 0.6)
+                {
+                    bestConfidence = score;
+                    bestLine = line;
+                    bestItem = _items[itemName];
+                }
+            }
+        }
+
+        if (bestItem != null)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"Best match: '{bestLine}' → '{bestItem.Name}' (confidence: {bestConfidence:P0})");
+        }
+
+        return (bestItem, bestLine, bestConfidence);
+    }
+
+    /// <summary>
+    /// Checks if a line is likely to be an item name (not a stat or UI element).
+    /// </summary>
+    private static bool IsLikelyItemName(string line)
+    {
+        var lower = line.ToLowerInvariant();
+
+        // Skip lines that are just numbers or have stat-like patterns
+        if (System.Text.RegularExpressions.Regex.IsMatch(line, @"^\d+[/x]\d+$"))  // "100/100", "5x"
+            return false;
+
+        if (System.Text.RegularExpressions.Regex.IsMatch(line, @"^\d+[\.,]?\d*\s*(kg|lb|%|m|s)?$"))  // "7.0", "100%"
+            return false;
+
+        // Skip known non-item patterns
+        foreach (var pattern in NonItemPatterns)
+        {
+            if (lower.Contains(pattern))
+                return false;
+        }
+
+        return true;
     }
 
     /// <summary>

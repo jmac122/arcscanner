@@ -34,6 +34,7 @@ public partial class OverlayWindow : Window, IDisposable
     private OcrManager? _ocrManager;
     private ScreenCapture? _screenCapture;
     private DataManager? _dataManager;
+    private IconManager? _iconManager;
     private HotkeyManager? _hotkeyManager;
     private ConfigManager? _configManager;
     private GameWindowDetector? _gameWindowDetector;
@@ -123,6 +124,24 @@ public partial class OverlayWindow : Window, IDisposable
                     LogMessage($"Inner exception: {ex.InnerException.Message}");
                 }
                 UpdateScanStatus(errorMsg);
+            }
+
+            // Initialize Icon Manager for template matching (optional - works without icons)
+            try
+            {
+                _iconManager = new IconManager();
+                if (_iconManager.IsReady)
+                {
+                    LogMessage($"Icon matching ready: {_iconManager.IconCount} icons loaded");
+                }
+                else
+                {
+                    LogMessage("Icon matching not available (no icons found in Data/icons/)");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"Icon manager init failed: {ex.Message}");
             }
 
             // Initialize hotkeys
@@ -767,33 +786,58 @@ public partial class OverlayWindow : Window, IDisposable
                     LogMessage($"Failed to save debug image: {saveEx.Message}");
                 }
 
+                // Try OCR-based matching first
                 var text = _ocrManager.Recognize(bitmap);
                 LogMessage($"OCR result: '{text?.Replace("\n", "\\n") ?? "(null)"}'");
 
-                if (string.IsNullOrWhiteSpace(text))
+                Models.Item? foundItem = null;
+                string matchSource = "";
+                double matchConfidence = 0;
+
+                // Phase 1: Smart OCR matching - try all lines, filter stats
+                if (!string.IsNullOrWhiteSpace(text))
                 {
-                    UpdateScanStatus("No text detected");
-                    HideTooltip();
-                    return;
+                    var (ocrItem, matchedLine, ocrConfidence) = _dataManager.GetBestItemMatch(text);
+                    if (ocrItem != null)
+                    {
+                        foundItem = ocrItem;
+                        matchSource = $"OCR: '{matchedLine}'";
+                        matchConfidence = ocrConfidence;
+                        LogMessage($"OCR match: '{matchedLine}' → '{ocrItem.Name}' ({ocrConfidence:P0})");
+                    }
                 }
 
-                // Extract item name (first line typically)
-                var itemName = text.Split('\n')[0].Trim();
-                LogMessage($"Extracted item name: '{itemName}'");
-                var item = _dataManager.GetItem(itemName);
-
-                if (item != null)
+                // Phase 2: Icon matching (if available and OCR didn't find high-confidence match)
+                if (_iconManager?.IsReady == true && (foundItem == null || matchConfidence < 0.9))
                 {
-                    ShowItemTooltip(item);
-                    UpdateScanStatus($"Found: {item.Name}");
-                    UpdateLastScannedItem(item.Name);
-                    LogMessage($"Item found in database: {item.Name}");
+                    var (iconItemName, iconConfidence) = _iconManager.MatchIcon(bitmap);
+                    if (iconItemName != null && iconConfidence > matchConfidence)
+                    {
+                        var iconItem = _dataManager.GetItem(iconItemName);
+                        if (iconItem != null)
+                        {
+                            foundItem = iconItem;
+                            matchSource = $"Icon ({iconConfidence:P0})";
+                            matchConfidence = iconConfidence;
+                            LogMessage($"Icon match: '{iconItemName}' ({iconConfidence:P0}) - better than OCR");
+                        }
+                    }
+                }
+
+                // Display result
+                if (foundItem != null)
+                {
+                    ShowItemTooltip(foundItem);
+                    UpdateScanStatus($"Found: {foundItem.Name}");
+                    UpdateLastScannedItem(foundItem.Name);
+                    LogMessage($"Final match via {matchSource}: {foundItem.Name}");
                 }
                 else
                 {
-                    UpdateScanStatus($"Unknown item: {itemName}");
+                    var firstLine = text?.Split('\n').FirstOrDefault()?.Trim() ?? "nothing";
+                    UpdateScanStatus($"Unknown: {firstLine}");
                     HideTooltip();
-                    LogMessage($"Item not found in database");
+                    LogMessage($"No match found. OCR first line was: '{firstLine}'");
                 }
             }
         }
@@ -1034,6 +1078,7 @@ public partial class OverlayWindow : Window, IDisposable
         _gameWindowDetector?.Dispose();
         _hotkeyManager?.Dispose();
         _ocrManager?.Dispose();
+        _iconManager?.Dispose();
         _eventApiClient?.Dispose();
 
         GC.SuppressFinalize(this);

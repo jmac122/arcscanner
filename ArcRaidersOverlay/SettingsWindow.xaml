@@ -89,6 +89,24 @@
         <GroupBox Grid.Row="2" Header="Item Scanner" Foreground="White"
                   BorderBrush="#555555" Margin="0,0,0,15">
             <StackPanel Margin="10">
+                <!-- Resolution Preset -->
+                <TextBlock Text="Game Resolution:" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox x:Name="ResolutionPreset" Width="120"
+                              SelectionChanged="ResolutionPreset_Changed">
+                        <ComboBoxItem Content="1080p" Tag="1080p"/>
+                        <ComboBoxItem Content="1440p" Tag="1440p"/>
+                        <ComboBoxItem Content="4K" Tag="4K"/>
+                        <ComboBoxItem Content="Custom" Tag="Custom"/>
+                    </ComboBox>
+                    <TextBlock Grid.Column="1" Text="Adjusts scan region size for your resolution"
+                               Foreground="#888888" FontSize="10" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                </Grid>
+
                 <!-- Cursor-based scanning toggle -->
                 <CheckBox x:Name="UseCursorScanning" Content="Scan at cursor position (recommended)"
                           Checked="UseCursorScanning_Changed" Unchecked="UseCursorScanning_Changed"
@@ -112,7 +130,24 @@
                         <TextBlock Grid.Column="2" Text="Height:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                         <TextBox x:Name="ScanRegionHeight" Grid.Column="3"/>
                     </Grid>
-                    <TextBlock Text="Larger = more text captured, but slower. Default: 500x300"
+                    <TextBlock Text="Larger = more text captured, but slower"
+                               Foreground="#888888" FontSize="10" Margin="0,5,0,10"/>
+
+                    <TextBlock Text="Scan Offset (from cursor):" Margin="0,0,0,5"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="X:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBox x:Name="ScanOffsetX" Grid.Column="1" Margin="0,0,15,0"/>
+                        <TextBlock Grid.Column="2" Text="Y:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBox x:Name="ScanOffsetY" Grid.Column="3"/>
+                    </Grid>
+                    <TextBlock Text="Positive X = right of cursor, Negative Y = above cursor"
                                Foreground="#888888" FontSize="10" Margin="0,5,0,0"/>
                 </StackPanel>
 

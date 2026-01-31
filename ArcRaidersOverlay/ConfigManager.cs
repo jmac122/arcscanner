@@ -254,14 +254,14 @@ public class AppConfig
     public int LastGameHeight { get; set; }
 
     /// <summary>
-    /// Width of the scan capture region (centered on cursor).
+    /// Width of the scan capture region.
     /// </summary>
-    public int ScanRegionWidth { get; set; } = 500;
+    public int ScanRegionWidth { get; set; } = 400;
 
     /// <summary>
-    /// Height of the scan capture region (centered on cursor).
+    /// Height of the scan capture region.
     /// </summary>
-    public int ScanRegionHeight { get; set; } = 300;
+    public int ScanRegionHeight { get; set; } = 350;
 
     /// <summary>
     /// When true, scan captures at cursor position. When false, uses fixed TooltipRegion.
@@ -270,14 +270,60 @@ public class AppConfig
 
     /// <summary>
     /// Horizontal offset from cursor for tooltip capture (positive = right).
-    /// Arc Raiders tooltips appear far to the right of the cursor.
+    /// Arc Raiders tooltips appear to the right of the cursor.
     /// </summary>
-    public int ScanOffsetX { get; set; } = 150;
+    public int ScanOffsetX { get; set; } = 100;
 
     /// <summary>
-    /// Vertical offset from cursor for tooltip capture (positive = down).
+    /// Vertical offset from cursor for tooltip capture (negative = up).
+    /// Arc Raiders tooltips appear above the cursor, so this should be negative.
     /// </summary>
-    public int ScanOffsetY { get; set; } = -100;
+    public int ScanOffsetY { get; set; } = -200;
+
+    /// <summary>
+    /// Game resolution preset. Affects scan region size and icon matching.
+    /// Values: "1080p", "1440p", "4K", "Custom"
+    /// </summary>
+    public string GameResolution { get; set; } = "1080p";
+
+    /// <summary>
+    /// Applies resolution preset values. Call this when resolution changes.
+    /// The Y offset is negative to start ABOVE the cursor since Arc Raiders
+    /// tooltips appear above and to the right of the hovered item.
+    /// </summary>
+    public void ApplyResolutionPreset(string resolution)
+    {
+        GameResolution = resolution;
+
+        switch (resolution)
+        {
+            case "1080p":
+                ScanRegionWidth = 400;
+                ScanRegionHeight = 350;
+                ScanOffsetX = 100;
+                ScanOffsetY = -200;  // Start 200px above cursor to capture title
+                break;
+
+            case "1440p":
+                ScanRegionWidth = 500;
+                ScanRegionHeight = 450;
+                ScanOffsetX = 130;
+                ScanOffsetY = -270;  // Start 270px above cursor to capture title
+                break;
+
+            case "4K":
+            case "2160p":
+                ScanRegionWidth = 700;
+                ScanRegionHeight = 650;
+                ScanOffsetX = 200;
+                ScanOffsetY = -400;  // Start 400px above cursor to capture title
+                break;
+
+            case "Custom":
+                // Don't modify values - user has customized them
+                break;
+        }
+    }
 
     /// <summary>
     /// Modifier key for the scan hotkey (e.g., Ctrl, Alt, Shift).

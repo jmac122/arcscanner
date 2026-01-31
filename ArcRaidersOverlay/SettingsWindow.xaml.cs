@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.Win32;
 using WinForms = System.Windows.Forms;
 
@@ -110,15 +111,17 @@ public partial class SettingsWindow : Window
 
     #endregion
 
-    private RegionTextBoxes EventsRegionBoxes => new(EventsX, EventsY, EventsWidth, EventsHeight);
     private RegionTextBoxes TooltipRegionBoxes => new(TooltipX, TooltipY, TooltipWidth, TooltipHeight);
 
     private void LoadSettings()
     {
         var config = _configManager.Config;
 
-        // Load regions using helper
-        LoadRegionToTextBoxes(config.EventsRegion, EventsRegionBoxes);
+        // Events settings
+        ShowEvents.IsChecked = config.ShowEvents;
+        EventsCompactMode.IsChecked = config.EventsCompactMode;
+
+        // Load tooltip region
         LoadRegionToTextBoxes(config.TooltipRegion, TooltipRegionBoxes);
 
         // Game detection settings
@@ -139,6 +142,9 @@ public partial class SettingsWindow : Window
         UseCursorScanning.IsChecked = config.UseCursorBasedScanning;
         ScanRegionWidth.Text = config.ScanRegionWidth.ToString();
         ScanRegionHeight.Text = config.ScanRegionHeight.ToString();
+        ScanOffsetX.Text = config.ScanOffsetX.ToString();
+        ScanOffsetY.Text = config.ScanOffsetY.ToString();
+        LoadResolutionPreset(config.GameResolution);
         UpdateScanPanelVisibility();
 
         // OCR settings
@@ -148,6 +154,42 @@ public partial class SettingsWindow : Window
     private void UseCursorScanning_Changed(object sender, RoutedEventArgs e)
     {
         UpdateScanPanelVisibility();
+    }
+
+    private void LoadResolutionPreset(string resolution)
+    {
+        for (int i = 0; i < ResolutionPreset.Items.Count; i++)
+        {
+            if (ResolutionPreset.Items[i] is ComboBoxItem item && item.Tag?.ToString() == resolution)
+            {
+                ResolutionPreset.SelectedIndex = i;
+                return;
+            }
+        }
+        // Default to 1080p if not found
+        ResolutionPreset.SelectedIndex = 0;
+    }
+
+    private void ResolutionPreset_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (ResolutionPreset.SelectedItem is not ComboBoxItem selectedItem)
+            return;
+
+        var resolution = selectedItem.Tag?.ToString() ?? AppConfig.Resolution1080p;
+
+        // Don't update values if Custom is selected
+        if (resolution == AppConfig.ResolutionCustom)
+            return;
+
+        // Apply preset values to the UI
+        var config = _configManager.Config;
+        config.ApplyResolutionPreset(resolution);
+
+        // Update the text boxes with the preset values
+        ScanRegionWidth.Text = config.ScanRegionWidth.ToString();
+        ScanRegionHeight.Text = config.ScanRegionHeight.ToString();
+        ScanOffsetX.Text = config.ScanOffsetX.ToString();
+        ScanOffsetY.Text = config.ScanOffsetY.ToString();
     }
 
     private void UpdateScanPanelVisibility()
@@ -215,12 +257,6 @@ public partial class SettingsWindow : Window
         return string.Join(",", parts);
     }
 
-    private void CalibrateEvents_Click(object sender, RoutedEventArgs e)
-    {
-        var useGameRelative = UseGameRelative.IsChecked ?? true;
-        CalibrateRegion("Events Region", EventsRegionBoxes, useGameRelative);
-    }
-
     private void CalibrateTooltip_Click(object sender, RoutedEventArgs e)
     {
         var useGameRelative = UseGameRelative.IsChecked ?? true;
@@ -269,14 +305,25 @@ public partial class SettingsWindow : Window
         {
             var config = _configManager.Config;
 
-            // Parse regions using helper
-            config.EventsRegion = ParseRegionFromTextBoxes(EventsRegionBoxes);
+            // Events settings
+            config.ShowEvents = ShowEvents.IsChecked ?? true;
+            config.EventsCompactMode = EventsCompactMode.IsChecked ?? false;
+
+            // Parse tooltip region
             config.TooltipRegion = ParseRegionFromTextBoxes(TooltipRegionBoxes);
 
             // Item scanner settings
             config.UseCursorBasedScanning = UseCursorScanning.IsChecked ?? true;
             config.ScanRegionWidth = int.Parse(ScanRegionWidth.Text);
             config.ScanRegionHeight = int.Parse(ScanRegionHeight.Text);
+            config.ScanOffsetX = int.Parse(ScanOffsetX.Text);
+            config.ScanOffsetY = int.Parse(ScanOffsetY.Text);
+
+            // Save resolution preset
+            if (ResolutionPreset.SelectedItem is ComboBoxItem selectedResolution)
+            {
+                config.GameResolution = selectedResolution.Tag?.ToString() ?? AppConfig.Resolution1080p;
+            }
 
             // Game detection settings
             config.UseGameRelativeCoordinates = UseGameRelative.IsChecked ?? true;

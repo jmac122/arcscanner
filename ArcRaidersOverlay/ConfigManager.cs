@@ -30,6 +30,8 @@ public class ConfigManager
                 var config = JsonConvert.DeserializeObject<AppConfig>(json);
                 if (config != null)
                 {
+                    // Validate tessdata path - reset to default if invalid
+                    config.TessdataPath = ValidateTessdataPath(config.TessdataPath);
                     return config;
                 }
             }
@@ -41,6 +43,19 @@ public class ConfigManager
 
         // Return default config
         return CreateDefaultConfig();
+    }
+
+    private static string ValidateTessdataPath(string? savedPath)
+    {
+        var defaultPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "tessdata");
+
+        // If saved path is empty or doesn't exist, use default
+        if (string.IsNullOrWhiteSpace(savedPath) || !Directory.Exists(savedPath))
+        {
+            return defaultPath;
+        }
+
+        return savedPath;
     }
 
     public void Save()
@@ -100,6 +115,13 @@ public class ConfigManager
 
 public class AppConfig
 {
+    // Resolution preset constants
+    public const string Resolution1080p = "1080p";
+    public const string Resolution1440p = "1440p";
+    public const string Resolution4K = "4K";
+    public const string Resolution2160p = "2160p";  // Alias for 4K
+    public const string ResolutionCustom = "Custom";
+
     public string TessdataPath { get; set; } = "";
     public RegionConfig EventsRegion { get; set; } = new();
     public RegionConfig TooltipRegion { get; set; } = new();
@@ -108,6 +130,89 @@ public class AppConfig
     public bool StartWithWindows { get; set; }
     public bool StartMinimized { get; set; }
     public int EventPollIntervalSeconds { get; set; } = 15;
+
+    // Events display settings
+    /// <summary>
+    /// When true, events panel is visible on the overlay.
+    /// </summary>
+    public bool ShowEvents { get; set; } = true;
+
+    /// <summary>
+    /// When true, shows compact event view (just count + next event).
+    /// </summary>
+    public bool EventsCompactMode { get; set; } = false;
+
+    /// <summary>
+    /// Modifier keys for the events toggle hotkey.
+    /// </summary>
+    public string EventsToggleHotkeyModifier { get; set; } = "";
+
+    /// <summary>
+    /// Key for the events toggle hotkey.
+    /// </summary>
+    public string EventsToggleHotkeyKey { get; set; } = "F8";
+
+    /// <summary>
+    /// Gets the events toggle hotkey modifier as ModifierKeys enum.
+    /// </summary>
+    [JsonIgnore]
+    public ModifierKeys EventsToggleModifierKeys
+    {
+        get
+        {
+            return ParseModifierKeys(EventsToggleHotkeyModifier, ModifierKeys.None);
+        }
+    }
+
+    /// <summary>
+    /// Gets the events toggle key as Key enum.
+    /// </summary>
+    [JsonIgnore]
+    public Key EventsToggleKey
+    {
+        get
+        {
+            if (Enum.TryParse<Key>(EventsToggleHotkeyKey, out var key))
+                return key;
+            return Key.F8;
+        }
+    }
+
+    /// <summary>
+    /// Modifier keys for the overlay toggle hotkey.
+    /// </summary>
+    public string OverlayToggleHotkeyModifier { get; set; } = "";
+
+    /// <summary>
+    /// Key for the overlay toggle hotkey.
+    /// </summary>
+    public string OverlayToggleHotkeyKey { get; set; } = "F7";
+
+    /// <summary>
+    /// Gets the overlay toggle hotkey modifier as ModifierKeys enum.
+    /// </summary>
+    [JsonIgnore]
+    public ModifierKeys OverlayToggleModifierKeys
+    {
+        get
+        {
+            return ParseModifierKeys(OverlayToggleHotkeyModifier, ModifierKeys.None);
+        }
+    }
+
+    /// <summary>
+    /// Gets the overlay toggle key as Key enum.
+    /// </summary>
+    [JsonIgnore]
+    public Key OverlayToggleKey
+    {
+        get
+        {
+            if (Enum.TryParse<Key>(OverlayToggleHotkeyKey, out var key))
+                return key;
+            return Key.F7;
+        }
+    }
 
     // Game window detection settings
     /// <summary>
@@ -138,19 +243,89 @@ public class AppConfig
     public int LastGameHeight { get; set; }
 
     /// <summary>
-    /// Width of the scan capture region (centered on cursor).
+    /// Width of the scan capture region.
     /// </summary>
-    public int ScanRegionWidth { get; set; } = 500;
+    public int ScanRegionWidth { get; set; } = 400;
 
     /// <summary>
-    /// Height of the scan capture region (centered on cursor).
+    /// Height of the scan capture region.
     /// </summary>
-    public int ScanRegionHeight { get; set; } = 300;
+    public int ScanRegionHeight { get; set; } = 350;
 
     /// <summary>
     /// When true, scan captures at cursor position. When false, uses fixed TooltipRegion.
     /// </summary>
     public bool UseCursorBasedScanning { get; set; } = true;
+
+    /// <summary>
+    /// Horizontal offset from cursor for tooltip capture (positive = right).
+    /// Arc Raiders tooltips appear to the right of the cursor.
+    /// </summary>
+    public int ScanOffsetX { get; set; } = 100;
+
+    /// <summary>
+    /// Vertical offset from cursor for tooltip capture (negative = up).
+    /// Arc Raiders tooltips appear above the cursor, so this should be negative.
+    /// </summary>
+    public int ScanOffsetY { get; set; } = -200;
+
+    /// <summary>
+    /// Game resolution preset. Affects scan region size and icon matching.
+    /// Use the Resolution* constants (Resolution1080p, Resolution1440p, Resolution4K, ResolutionCustom).
+    /// </summary>
+    public string GameResolution { get; set; } = Resolution1080p;
+
+    /// <summary>
+    /// Size of inventory icons at the current resolution (pixels).
+    /// Used for template matching.
+    /// </summary>
+    public int IconSize { get; set; } = 48;
+
+    /// <summary>
+    /// Applies resolution preset values. Call this when resolution changes.
+    /// The Y offset is negative to start ABOVE the cursor since Arc Raiders
+    /// tooltips appear above and to the right of the hovered item.
+    /// </summary>
+    public void ApplyResolutionPreset(string resolution)
+    {
+        var previousResolution = GameResolution;
+        GameResolution = resolution;
+
+        switch (resolution)
+        {
+            case Resolution1080p:
+                ScanRegionWidth = 400;
+                ScanRegionHeight = 350;
+                ScanOffsetX = 100;
+                ScanOffsetY = -200;
+                IconSize = 48;  // ~48px icons at 1080p
+                break;
+
+            case Resolution1440p:
+                ScanRegionWidth = 500;
+                ScanRegionHeight = 550;
+                ScanOffsetX = 10;      // Tooltip is right next to the icon
+                ScanOffsetY = -500;    // Start much higher to capture item name
+                IconSize = 62;
+                break;
+
+            case Resolution4K:
+            case Resolution2160p:
+                ScanRegionWidth = 700;
+                ScanRegionHeight = 650;
+                ScanOffsetX = 200;
+                ScanOffsetY = -400;
+                IconSize = 96;  // ~96px icons at 4K
+                break;
+
+            case ResolutionCustom:
+                // Don't modify values - user has customized them
+                break;
+            default:
+                GameResolution = previousResolution;
+                break;
+        }
+    }
 
     /// <summary>
     /// Modifier key for the scan hotkey (e.g., Ctrl, Alt, Shift).
@@ -172,17 +347,23 @@ public class AppConfig
     {
         get
         {
-            if (string.IsNullOrEmpty(ScanHotkeyModifier))
-                return ModifierKeys.Control | ModifierKeys.Shift;
-
-            ModifierKeys result = ModifierKeys.None;
-            foreach (var part in ScanHotkeyModifier.Split(','))
-            {
-                if (Enum.TryParse<ModifierKeys>(part.Trim(), out var mod))
-                    result |= mod;
-            }
-            return result == ModifierKeys.None ? ModifierKeys.Control | ModifierKeys.Shift : result;
+            return ParseModifierKeys(ScanHotkeyModifier, ModifierKeys.Control | ModifierKeys.Shift);
         }
+    }
+
+    private static ModifierKeys ParseModifierKeys(string? modifierValue, ModifierKeys fallbackValue)
+    {
+        if (string.IsNullOrWhiteSpace(modifierValue))
+            return fallbackValue;
+
+        ModifierKeys result = ModifierKeys.None;
+        foreach (var part in modifierValue.Split(','))
+        {
+            if (Enum.TryParse<ModifierKeys>(part.Trim(), out var mod))
+                result |= mod;
+        }
+
+        return result == ModifierKeys.None ? fallbackValue : result;
     }
 
     /// <summary>

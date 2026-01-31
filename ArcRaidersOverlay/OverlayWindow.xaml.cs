@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,12 +35,16 @@ public partial class OverlayWindow : Window, IDisposable
     private OcrManager? _ocrManager;
     private ScreenCapture? _screenCapture;
     private DataManager? _dataManager;
+    private IconManager? _iconManager;
     private HotkeyManager? _hotkeyManager;
     private ConfigManager? _configManager;
     private GameWindowDetector? _gameWindowDetector;
+    private EventApiClient? _eventApiClient;
     private bool _isLocked;
     private bool _isClickThrough;
     private bool _disposed;
+    private static readonly string LogFilePath = Path.Combine(
+        AppDomain.CurrentDomain.BaseDirectory, "overlay.log");
 
     public OverlayWindow()
     {
@@ -63,6 +70,24 @@ public partial class OverlayWindow : Window, IDisposable
             _tooltipHideTimer.Stop();
             HideTooltip();
         };
+
+        // Clear old log on startup
+        try
+        {
+            File.WriteAllText(LogFilePath, $"=== ArcRaidersOverlay Log Started {DateTime.Now} ===\n");
+        }
+        catch { /* Ignore logging errors */ }
+    }
+
+    private static void LogMessage(string message)
+    {
+        try
+        {
+            var logLine = $"[{DateTime.Now:HH:mm:ss}] {message}\n";
+            File.AppendAllText(LogFilePath, logLine);
+            System.Diagnostics.Debug.WriteLine(message);
+        }
+        catch { /* Ignore logging errors */ }
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -85,11 +110,39 @@ public partial class OverlayWindow : Window, IDisposable
             // Initialize OCR (may fail if tessdata not present)
             try
             {
-                _ocrManager = new OcrManager(_configManager.Config.TessdataPath);
+                var tessdataPath = _configManager.Config.TessdataPath;
+                LogMessage($"Initializing OCR with tessdata path: {tessdataPath}");
+                _ocrManager = new OcrManager(tessdataPath);
+                LogMessage("OCR initialized successfully");
             }
             catch (Exception ex)
             {
-                UpdateScanStatus($"OCR init failed: {ex.Message}");
+                var errorMsg = $"OCR init failed: {ex.Message}";
+                LogMessage($"ERROR: {errorMsg}");
+                LogMessage($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    LogMessage($"Inner exception: {ex.InnerException.Message}");
+                }
+                UpdateScanStatus(errorMsg);
+            }
+
+            // Initialize Icon Manager for template matching (optional - works without icons)
+            try
+            {
+                _iconManager = new IconManager();
+                if (_iconManager.IsReady)
+                {
+                    LogMessage($"Icon matching ready: {_iconManager.IconCount} icons loaded");
+                }
+                else
+                {
+                    LogMessage("Icon matching not available (no icons found in Data/icons/)");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"Icon manager init failed: {ex.Message}");
             }
 
             // Initialize hotkeys
@@ -107,6 +160,9 @@ public partial class OverlayWindow : Window, IDisposable
             _gameWindowDetector.GameWindowChanged += OnGameWindowChanged;
             _gameWindowDetector.StartMonitoring();
 
+            // Initialize event API client (replaces OCR-based event detection)
+            _eventApiClient = new EventApiClient();
+
             // Apply saved position or follow game
             if (_configManager.Config.FollowGameWindow && _gameWindowDetector.IsGameRunning)
             {
@@ -118,9 +174,17 @@ public partial class OverlayWindow : Window, IDisposable
                 Top = _configManager.Config.OverlayY;
             }
 
-            // Start event polling
-            _eventPollTimer.Start();
-            OnEventPollTick(this, EventArgs.Empty);
+            // Start event polling (only if events are enabled)
+            if (_configManager.Config.ShowEvents)
+            {
+                EventsBorder.Visibility = Visibility.Visible;
+                _eventPollTimer.Start();
+                OnEventPollTick(this, EventArgs.Empty);
+            }
+            else
+            {
+                EventsBorder.Visibility = Visibility.Collapsed;
+            }
 
             UpdateGameStatus();
             UpdateScanStatusWithHotkey();
@@ -136,13 +200,25 @@ public partial class OverlayWindow : Window, IDisposable
     {
         if (_hotkeyManager == null || _configManager == null) return;
 
-        // Unregister existing hotkey first
+        // Unregister existing hotkeys first
         _hotkeyManager.UnregisterHotkey(HotkeyManager.SCAN_HOTKEY_ID);
+        _hotkeyManager.UnregisterHotkey(HotkeyManager.EVENTS_TOGGLE_HOTKEY_ID);
+        _hotkeyManager.UnregisterHotkey(HotkeyManager.OVERLAY_TOGGLE_HOTKEY_ID);
 
-        // Register with configured values
+        // Register scan hotkey
         var modifiers = _configManager.Config.ScanModifierKeys;
         var key = _configManager.Config.ScanKey;
         _hotkeyManager.RegisterHotkey(HotkeyManager.SCAN_HOTKEY_ID, modifiers, key);
+
+        // Register events toggle hotkey (F8 by default)
+        var eventsModifiers = _configManager.Config.EventsToggleModifierKeys;
+        var eventsKey = _configManager.Config.EventsToggleKey;
+        _hotkeyManager.RegisterHotkey(HotkeyManager.EVENTS_TOGGLE_HOTKEY_ID, eventsModifiers, eventsKey);
+
+        // Register overlay toggle hotkey (F7 by default)
+        var overlayModifiers = _configManager.Config.OverlayToggleModifierKeys;
+        var overlayKey = _configManager.Config.OverlayToggleKey;
+        _hotkeyManager.RegisterHotkey(HotkeyManager.OVERLAY_TOGGLE_HOTKEY_ID, overlayModifiers, overlayKey);
     }
 
     public string GetScanHotkeyDisplayString()
@@ -173,6 +249,52 @@ public partial class OverlayWindow : Window, IDisposable
     private void UpdateScanStatusWithHotkey()
     {
         UpdateScanStatus($"Press [{GetScanHotkeyDisplayString()}] to scan item");
+        UpdateScannerInfo();
+    }
+
+    private void UpdateScannerInfo()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            // Update item count
+            var itemCount = _dataManager?.ItemCount ?? 0;
+            var iconCount = _iconManager?.IconCount ?? 0;
+
+            if (itemCount > 0 || iconCount > 0)
+            {
+                var parts = new List<string>();
+                if (itemCount > 0) parts.Add($"{itemCount} items");
+                if (iconCount > 0) parts.Add($"{iconCount} icons");
+                ItemCountText.Text = $"({string.Join(", ", parts)})";
+            }
+            else
+            {
+                ItemCountText.Text = "";
+            }
+
+            // Update scanner status indicator
+            var isReady = _ocrManager != null || (_iconManager?.IsReady ?? false);
+            if (isReady)
+            {
+                ScannerStatusBorder.Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromArgb(0x22, 0x00, 0xD4, 0x6E));
+                ScannerStatusDot.Fill = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x00, 0xD4, 0x6E));
+                ScannerStatusLabel.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x00, 0xD4, 0x6E));
+                ScannerStatusLabel.Text = "Ready";
+            }
+            else
+            {
+                ScannerStatusBorder.Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromArgb(0x22, 0xFF, 0x55, 0x55));
+                ScannerStatusDot.Fill = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xFF, 0x55, 0x55));
+                ScannerStatusLabel.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xFF, 0x55, 0x55));
+                ScannerStatusLabel.Text = "Not Ready";
+            }
+        });
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -348,9 +470,9 @@ public partial class OverlayWindow : Window, IDisposable
 
     #region Event Polling
 
-    private void OnEventPollTick(object? sender, EventArgs e)
+    private async void OnEventPollTick(object? sender, EventArgs e)
     {
-        if (_ocrManager == null || _screenCapture == null || _configManager == null)
+        if (_eventApiClient == null)
         {
             UpdateEventsPanel(new List<GameEvent>());
             return;
@@ -358,32 +480,19 @@ public partial class OverlayWindow : Window, IDisposable
 
         try
         {
-            var config = _configManager.Config;
-            if (!config.EventsRegion.IsValid)
-            {
-                // No region configured - show placeholder
-                UpdateEventsPanel(new List<GameEvent>());
-                return;
-            }
-
-            // Capture events region (convert to screen coords if using game-relative)
-            if (!TryGetScreenRegion(config.EventsRegion, out var eventsRegion))
-            {
-                UpdateEventsPanel(new List<GameEvent>());
-                return;
-            }
-            using var bitmap = _screenCapture.CaptureRegion(eventsRegion);
-            var text = _ocrManager.Recognize(bitmap);
-
-            // Parse events
-            var events = EventParser.Parse(text);
+            // Fetch events from API
+            var events = await _eventApiClient.GetEventsAsync();
             UpdateEventsPanel(events);
 
-            // Detect current map
-            var mapInfo = EventParser.DetectMapInfo(text);
-            if (mapInfo != null)
+            // Load minimap for first active event's map
+            var activeEvent = events.FirstOrDefault(ev => ev.Timer.StartsWith("ACTIVE"));
+            if (activeEvent != null)
             {
-                LoadMinimap(mapInfo);
+                var mapInfo = EventParser.DetectMapInfo(activeEvent.Location);
+                if (mapInfo != null)
+                {
+                    LoadMinimap(mapInfo);
+                }
             }
         }
         catch (Exception ex)
@@ -397,9 +506,12 @@ public partial class OverlayWindow : Window, IDisposable
         Dispatcher.Invoke(() =>
         {
             EventsPanel.Children.Clear();
+            var isCompactMode = _configManager?.Config.EventsCompactMode ?? false;
 
             if (events.Count == 0)
             {
+                EventsPanel.Visibility = Visibility.Visible;
+                EventsCompactSummary.Visibility = Visibility.Collapsed;
                 EventsPanel.Children.Add(new TextBlock
                 {
                     Text = "No events detected",
@@ -411,53 +523,90 @@ public partial class OverlayWindow : Window, IDisposable
                 return;
             }
 
-            GameEvent? activeEvent = null;
-
-            foreach (var evt in events)
+            // Compact mode: show summary only
+            if (isCompactMode)
             {
-                var panel = new StackPanel { Orientation = Orientation.Horizontal };
+                EventsPanel.Visibility = Visibility.Collapsed;
+                EventsCompactSummary.Visibility = Visibility.Visible;
 
-                // Event icon based on type
-                var icon = new TextBlock
+                var activeCount = events.Count(e => e.Timer.Contains("ACTIVE"));
+                var nextEvent = events.FirstOrDefault(e => !e.Timer.Contains("ACTIVE"));
+
+                if (activeCount > 0)
                 {
-                    Text = GetEventIcon(evt.Name),
-                    Foreground = GetEventBrush(evt.Name),
-                    Margin = new Thickness(0, 0, 5, 0),
-                    FontSize = 11
-                };
-
-                var nameText = new TextBlock
+                    EventsCompactSummary.Text = $"{activeCount} active, {events.Count} total";
+                    EventsCompactSummary.Foreground = Theme.BrushTimerActive;
+                }
+                else if (nextEvent != null)
                 {
-                    Text = $"{evt.Name}",
-                    Style = (Style)FindResource("EventTextStyle")
-                };
-
-                var locationText = new TextBlock
+                    EventsCompactSummary.Text = $"{events.Count} events - next: {nextEvent.Name} {nextEvent.Timer}";
+                    EventsCompactSummary.Foreground = Theme.BrushTextSecondary;
+                }
+                else
                 {
-                    Text = $" @ {evt.Location}",
-                    Style = (Style)FindResource("EventTextStyle"),
-                    Foreground = Theme.BrushTextSecondary
-                };
+                    EventsCompactSummary.Text = $"{events.Count} events";
+                    EventsCompactSummary.Foreground = Theme.BrushTextSecondary;
+                }
+            }
+            else
+            {
+                EventsPanel.Visibility = Visibility.Visible;
+                EventsCompactSummary.Visibility = Visibility.Collapsed;
+            }
 
-                var timerText = new TextBlock
+            // Find active event for the banner
+            var activeEvent = events.FirstOrDefault(evt =>
+                evt.Timer.Contains("ACTIVE", StringComparison.OrdinalIgnoreCase) ||
+                evt.Timer.StartsWith("0:") || evt.Timer.StartsWith("1:"));
+
+            // Only build full event list if not in compact mode
+            if (!isCompactMode)
+            {
+                // Deduplicate: show only the next occurrence of each event type
+                var uniqueEvents = events
+                    .GroupBy(e => e.Name)
+                    .Select(g => g.First())
+                    .ToList();
+
+                foreach (var evt in uniqueEvents)
                 {
-                    Text = $" [{evt.Timer}]",
-                    Style = (Style)FindResource("EventTextStyle"),
-                    Foreground = GetTimerBrush(evt.Timer)
-                };
+                    var panel = new StackPanel { Orientation = Orientation.Horizontal };
 
-                panel.Children.Add(icon);
-                panel.Children.Add(nameText);
-                panel.Children.Add(locationText);
-                panel.Children.Add(timerText);
+                    // Event icon based on type
+                    var icon = new TextBlock
+                    {
+                        Text = GetEventIcon(evt.Name),
+                        Foreground = GetEventBrush(evt.Name),
+                        Margin = new Thickness(0, 0, 5, 0),
+                        FontSize = 11
+                    };
 
-                EventsPanel.Children.Add(panel);
+                    var nameText = new TextBlock
+                    {
+                        Text = $"{evt.Name}",
+                        Style = (Style)FindResource("EventTextStyle")
+                    };
 
-                // Check if this event is active (timer shows "ACTIVE" or very low time)
-                if (evt.Timer.Contains("ACTIVE", StringComparison.OrdinalIgnoreCase) ||
-                    evt.Timer.StartsWith("0:") || evt.Timer.StartsWith("1:"))
-                {
-                    activeEvent = evt;
+                    var locationText = new TextBlock
+                    {
+                        Text = $" @ {evt.Location}",
+                        Style = (Style)FindResource("EventTextStyle"),
+                        Foreground = Theme.BrushTextSecondary
+                    };
+
+                    var timerText = new TextBlock
+                    {
+                        Text = $" [{evt.Timer}]",
+                        Style = (Style)FindResource("EventTextStyle"),
+                        Foreground = GetTimerBrush(evt.Timer)
+                    };
+
+                    panel.Children.Add(icon);
+                    panel.Children.Add(nameText);
+                    panel.Children.Add(locationText);
+                    panel.Children.Add(timerText);
+
+                    EventsPanel.Children.Add(panel);
                 }
             }
 
@@ -563,6 +712,68 @@ public partial class OverlayWindow : Window, IDisposable
         {
             ScanItem();
         }
+        else if (hotkeyId == HotkeyManager.EVENTS_TOGGLE_HOTKEY_ID)
+        {
+            ToggleEventsVisibility();
+        }
+        else if (hotkeyId == HotkeyManager.OVERLAY_TOGGLE_HOTKEY_ID)
+        {
+            ToggleOverlayVisibility();
+        }
+    }
+
+    private void ToggleOverlayVisibility()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (Visibility == Visibility.Visible)
+            {
+                Hide();
+                // Stop polling when hidden to save resources
+                _eventPollTimer.Stop();
+            }
+            else
+            {
+                Show();
+                // Resume polling if events are enabled
+                if (_configManager?.Config.ShowEvents == true)
+                {
+                    _eventPollTimer.Start();
+                    OnEventPollTick(this, EventArgs.Empty);
+                }
+            }
+        });
+    }
+
+    private void ToggleEventsVisibility()
+    {
+        if (_configManager == null) return;
+
+        Dispatcher.Invoke(() =>
+        {
+            // Toggle visibility
+            _configManager.Config.ShowEvents = !_configManager.Config.ShowEvents;
+            var isVisible = _configManager.Config.ShowEvents;
+
+            // Update UI
+            EventsBorder.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+            ActiveEventBorder.Visibility = isVisible && ActiveEventBorder.Visibility == Visibility.Visible
+                ? Visibility.Visible : Visibility.Collapsed;
+
+            // Start/stop API polling based on visibility
+            if (isVisible)
+            {
+                _eventPollTimer.Start();
+                OnEventPollTick(this, EventArgs.Empty); // Immediate refresh
+            }
+            else
+            {
+                _eventPollTimer.Stop();
+            }
+
+            // Save preference
+            _configManager.Save();
+        });
     }
 
     private void ScanItem()
@@ -579,63 +790,139 @@ public partial class OverlayWindow : Window, IDisposable
             UpdateScanStatus("Scanning...");
 
             var config = _configManager.Config;
-            System.Drawing.Bitmap bitmap;
+            var cursorPos = System.Windows.Forms.Cursor.Position;
+            LogMessage($"Scan triggered - Cursor at ({cursorPos.X}, {cursorPos.Y})");
 
-            if (config.UseCursorBasedScanning)
+            Models.Item? foundItem = null;
+            string matchSource = "";
+            double matchConfidence = 0;
+
+            // Phase 1: Try icon matching first (capture larger region centered on cursor)
+            // RatScanner approach: capture 3x icon size, then search for icon within that region
+            if (_iconManager?.IsReady == true && config.UseCursorBasedScanning)
             {
-                // Capture region centered on current cursor position
-                bitmap = _screenCapture.CaptureAtCursor(
-                    config.ScanRegionWidth,
-                    config.ScanRegionHeight);
+                var iconSize = config.IconSize;
+                // Capture 3x icon size to ensure full icon is captured regardless of cursor position
+                // Must be larger than template size (96px) for MatchIconInRegion to work
+                var captureSize = Math.Max(iconSize * 3, 200);
+                var iconCapture = _screenCapture.CaptureTooltipAtCursor(
+                    captureSize,
+                    captureSize,
+                    -captureSize / 2,  // Center on cursor
+                    -captureSize / 2);
+
+                using (iconCapture)
+                {
+                    LogMessage($"Icon capture: {iconCapture.Width}x{iconCapture.Height} (3x icon size, centered on cursor)");
+
+                    // Save icon debug image
+                    try
+                    {
+                        var debugDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug");
+                        Directory.CreateDirectory(debugDir);
+                        var iconDebugPath = Path.Combine(debugDir, $"scan_icon_{DateTime.Now:HHmmss}.png");
+                        iconCapture.Save(iconDebugPath, System.Drawing.Imaging.ImageFormat.Png);
+                        LogMessage($"Icon debug image saved: {iconDebugPath}");
+                    }
+                    catch { }
+
+                    // Use MatchIconInRegion to find the icon within the larger capture
+                    var (iconItemName, iconConf, iconLoc) = _iconManager.MatchIconInRegion(iconCapture);
+                    if (iconItemName != null && iconConf >= 0.6)
+                    {
+                        var iconItem = _dataManager.GetItem(iconItemName);
+                        if (iconItem != null)
+                        {
+                            foundItem = iconItem;
+                            matchSource = $"Icon ({iconConf:P0})";
+                            matchConfidence = iconConf;
+                            LogMessage($"Icon match: '{iconItemName}' at ({iconLoc.X},{iconLoc.Y}) ({iconConf:P0})");
+                        }
+                    }
+                    else
+                    {
+                        LogMessage($"Icon match failed or low confidence: {iconConf:P0}");
+                    }
+                }
             }
-            else
+
+            // Phase 2: OCR fallback (capture tooltip area if icon match failed or low confidence)
+            if (foundItem == null || matchConfidence < 0.85)
             {
-                // Legacy: Use fixed tooltip region (requires calibration)
-                if (!config.TooltipRegion.IsValid)
+                System.Drawing.Bitmap? tooltipBitmap = null;
+
+                if (config.UseCursorBasedScanning)
                 {
-                    UpdateScanStatus("Tooltip region not configured");
-                    return;
-                }
-
-                if (!TryGetScreenRegion(config.TooltipRegion, out var tooltipRegion))
-                {
-                    UpdateScanStatus("Game not detected");
-                    return;
-                }
-                bitmap = _screenCapture.CaptureRegion(tooltipRegion);
-            }
-
-            using (bitmap)
-            {
-                var text = _ocrManager.Recognize(bitmap);
-
-                if (string.IsNullOrWhiteSpace(text))
-                {
-                    UpdateScanStatus("No text detected");
-                    HideTooltip();
-                    return;
-                }
-
-                // Extract item name (first line typically)
-                var itemName = text.Split('\n')[0].Trim();
-                var item = _dataManager.GetItem(itemName);
-
-                if (item != null)
-                {
-                    ShowItemTooltip(item);
-                    UpdateScanStatus($"Found: {item.Name}");
-                    UpdateLastScannedItem(item.Name);
+                    LogMessage($"Capturing tooltip {config.ScanRegionWidth}x{config.ScanRegionHeight} at offset ({config.ScanOffsetX}, {config.ScanOffsetY})");
+                    tooltipBitmap = _screenCapture.CaptureTooltipAtCursor(
+                        config.ScanRegionWidth,
+                        config.ScanRegionHeight,
+                        config.ScanOffsetX,
+                        config.ScanOffsetY);
                 }
                 else
                 {
-                    UpdateScanStatus($"Unknown item: {itemName}");
-                    HideTooltip();
+                    // Legacy: Use fixed tooltip region
+                    if (config.TooltipRegion.IsValid && TryGetScreenRegion(config.TooltipRegion, out var tooltipRegion))
+                    {
+                        tooltipBitmap = _screenCapture.CaptureRegion(tooltipRegion);
+                    }
                 }
+
+                if (tooltipBitmap != null)
+                {
+                    using (tooltipBitmap)
+                    {
+                        LogMessage($"Tooltip capture: {tooltipBitmap.Width}x{tooltipBitmap.Height}");
+
+                        // Save tooltip debug image
+                        try
+                        {
+                            var debugDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug");
+                            Directory.CreateDirectory(debugDir);
+                            var debugPath = Path.Combine(debugDir, $"scan_tooltip_{DateTime.Now:HHmmss}.png");
+                            tooltipBitmap.Save(debugPath, System.Drawing.Imaging.ImageFormat.Png);
+                            LogMessage($"Tooltip debug image saved: {debugPath}");
+                        }
+                        catch { }
+
+                        var text = _ocrManager.Recognize(tooltipBitmap);
+                        LogMessage($"OCR result: '{text?.Replace("\n", "\\n") ?? "(null)"}'");
+
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            var (ocrItem, matchedLine, ocrConfidence) = _dataManager.GetBestItemMatch(text);
+                            if (ocrItem != null && ocrConfidence > matchConfidence)
+                            {
+                                foundItem = ocrItem;
+                                matchSource = $"OCR: '{matchedLine}'";
+                                matchConfidence = ocrConfidence;
+                                LogMessage($"OCR match: '{matchedLine}' → '{ocrItem.Name}' ({ocrConfidence:P0})");
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Display result
+            if (foundItem != null)
+            {
+                ShowItemTooltip(foundItem);
+                UpdateScanStatus($"Found: {foundItem.Name}");
+                UpdateLastScannedItem(foundItem.Name);
+                LogMessage($"Final match via {matchSource}: {foundItem.Name}");
+            }
+            else
+            {
+                UpdateScanStatus("Unknown item");
+                HideTooltip();
+                LogMessage("No match found");
             }
         }
         catch (Exception ex)
         {
             UpdateScanStatus($"Scan error: {ex.Message}");
+            LogMessage($"ERROR: Scan failed: {ex}");
         }
     }
 
@@ -869,6 +1156,8 @@ public partial class OverlayWindow : Window, IDisposable
         _gameWindowDetector?.Dispose();
         _hotkeyManager?.Dispose();
         _ocrManager?.Dispose();
+        _iconManager?.Dispose();
+        _eventApiClient?.Dispose();
 
         GC.SuppressFinalize(this);
     }

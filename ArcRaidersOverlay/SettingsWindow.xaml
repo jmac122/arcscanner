@@ -29,6 +29,23 @@
         <Style TargetType="CheckBox">
             <Setter Property="Foreground" Value="White"/>
         </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="#555555"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#007ACC"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -48,41 +65,54 @@
         <TextBlock Grid.Row="0" Text="Overlay Settings" FontSize="20" FontWeight="Bold"
                    Margin="0,0,0,20"/>
 
-        <!-- Events Region -->
-        <GroupBox Grid.Row="1" Header="Events Region" Foreground="White"
+        <!-- Events Settings -->
+        <GroupBox Grid.Row="1" Header="Events Settings" Foreground="White"
                   BorderBrush="#555555" Margin="0,0,0,15">
-            <Grid Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <StackPanel Margin="10">
+                <CheckBox x:Name="ShowEvents" Content="Show events panel on overlay"
+                          Margin="0,0,0,5"/>
+                <TextBlock Text="Toggle with F8 hotkey. Disabling stops API polling to save bandwidth."
+                           Foreground="#888888" FontSize="10" Margin="20,0,0,10"/>
 
-                <TextBlock Text="X:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-                <TextBox x:Name="EventsX" Grid.Column="1" Margin="0,0,10,5"/>
-                <TextBlock Grid.Column="2" Text="Y:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-                <TextBox x:Name="EventsY" Grid.Column="3" Margin="0,0,0,5"/>
+                <CheckBox x:Name="EventsCompactMode" Content="Compact mode (show summary only)"
+                          Margin="0,0,0,5"/>
+                <TextBlock Text="Shows event count and next event instead of full list"
+                           Foreground="#888888" FontSize="10" Margin="20,0,0,10"/>
 
-                <TextBlock Grid.Row="1" Text="Width:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-                <TextBox x:Name="EventsWidth" Grid.Row="1" Grid.Column="1" Margin="0,0,10,5"/>
-                <TextBlock Grid.Row="1" Grid.Column="2" Text="Height:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-                <TextBox x:Name="EventsHeight" Grid.Row="1" Grid.Column="3" Margin="0,0,0,5"/>
-
-                <Button Grid.Row="2" Grid.ColumnSpan="4" Content="Calibrate Events Region"
-                        Click="CalibrateEvents_Click" Margin="0,10,0,0"/>
-            </Grid>
+                <TextBlock Text="Hotkeys:" Margin="0,5,0,5" FontWeight="SemiBold"/>
+                <TextBlock Text="• F7 - Toggle entire overlay visibility" Foreground="#AAAAAA" Margin="10,0,0,2"/>
+                <TextBlock Text="• F8 - Toggle events panel" Foreground="#AAAAAA" Margin="10,0,0,2"/>
+            </StackPanel>
         </GroupBox>
 
         <!-- Item Scanner Settings -->
         <GroupBox Grid.Row="2" Header="Item Scanner" Foreground="White"
                   BorderBrush="#555555" Margin="0,0,0,15">
             <StackPanel Margin="10">
+                <!-- Tip for best results -->
+                <Border Background="#2a3a2a" CornerRadius="4" Padding="8" Margin="0,0,0,10">
+                    <TextBlock Text="Tip: Click to select an item before scanning for best accuracy"
+                               Foreground="#90EE90" FontSize="11" TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- Resolution Preset -->
+                <TextBlock Text="Game Resolution:" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox x:Name="ResolutionPreset" Width="120"
+                              SelectionChanged="ResolutionPreset_Changed">
+                        <ComboBoxItem Content="1080p" Tag="1080p"/>
+                        <ComboBoxItem Content="1440p" Tag="1440p"/>
+                        <ComboBoxItem Content="4K" Tag="4K"/>
+                        <ComboBoxItem Content="Custom" Tag="Custom"/>
+                    </ComboBox>
+                    <TextBlock Grid.Column="1" Text="Adjusts scan region size for your resolution"
+                               Foreground="#888888" FontSize="10" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                </Grid>
+
                 <!-- Cursor-based scanning toggle -->
                 <CheckBox x:Name="UseCursorScanning" Content="Scan at cursor position (recommended)"
                           Checked="UseCursorScanning_Changed" Unchecked="UseCursorScanning_Changed"
@@ -106,7 +136,24 @@
                         <TextBlock Grid.Column="2" Text="Height:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                         <TextBox x:Name="ScanRegionHeight" Grid.Column="3"/>
                     </Grid>
-                    <TextBlock Text="Larger = more text captured, but slower. Default: 500x300"
+                    <TextBlock Text="Larger = more text captured, but slower"
+                               Foreground="#888888" FontSize="10" Margin="0,5,0,10"/>
+
+                    <TextBlock Text="Scan Offset (from cursor):" Margin="0,0,0,5"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="X:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBox x:Name="ScanOffsetX" Grid.Column="1" Margin="0,0,15,0"/>
+                        <TextBlock Grid.Column="2" Text="Y:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBox x:Name="ScanOffsetY" Grid.Column="3"/>
+                    </Grid>
+                    <TextBlock Text="Positive X = right of cursor, Negative Y = above cursor"
                                Foreground="#888888" FontSize="10" Margin="0,5,0,0"/>
                 </StackPanel>
 

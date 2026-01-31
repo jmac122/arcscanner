@@ -29,6 +29,10 @@ public class OcrManager : IDisposable
                 "Download from https://github.com/tesseract-ocr/tessdata_best");
         }
 
+        // Set native library search path for single-file publishing support
+        // This tells Tesseract where to find leptonica and tesseract DLLs
+        TesseractEnviornment.CustomSearchPath = AppDomain.CurrentDomain.BaseDirectory;
+
         _engine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default);
 
         // Configure for game text recognition

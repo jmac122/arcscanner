@@ -131,6 +131,43 @@ public static class Theme
 
     #endregion
 
+    #region UI Panel Colors
+
+    /// <summary>Panel background - very dark with slight transparency</summary>
+    public static readonly Color PanelBackground = Color.FromArgb(0xEE, 0x12, 0x14, 0x17);
+
+    /// <summary>Panel border - subtle dark border</summary>
+    public static readonly Color PanelBorder = Color.FromArgb(0x44, 0x44, 0x44, 0x44);
+
+    /// <summary>Section header text - slightly muted white</summary>
+    public static readonly Color SectionHeader = Color.FromRgb(0x88, 0x8A, 0x8C);
+
+    /// <summary>Active indicator - bright green</summary>
+    public static readonly Color ActiveIndicator = Color.FromRgb(0x00, 0xD4, 0x6E);
+
+    /// <summary>Card background - slightly lighter than panel</summary>
+    public static readonly Color CardBackground = Color.FromArgb(0x33, 0x2A, 0x2D, 0x32);
+
+    /// <summary>Scanner enabled - bright green</summary>
+    public static readonly Color ScannerEnabled = Color.FromRgb(0x00, 0xD4, 0x6E);
+
+    /// <summary>Scanner disabled - muted red</summary>
+    public static readonly Color ScannerDisabled = Color.FromRgb(0xFF, 0x55, 0x55);
+
+    #endregion
+
+    #region Panel Brushes
+
+    public static readonly SolidColorBrush BrushPanelBackground = new(PanelBackground);
+    public static readonly SolidColorBrush BrushPanelBorder = new(PanelBorder);
+    public static readonly SolidColorBrush BrushSectionHeader = new(SectionHeader);
+    public static readonly SolidColorBrush BrushActiveIndicator = new(ActiveIndicator);
+    public static readonly SolidColorBrush BrushCardBackground = new(CardBackground);
+    public static readonly SolidColorBrush BrushScannerEnabled = new(ScannerEnabled);
+    public static readonly SolidColorBrush BrushScannerDisabled = new(ScannerDisabled);
+
+    #endregion
+
     // Freeze brushes for better performance (makes them immutable and thread-safe)
     static Theme()
     {
@@ -162,5 +199,14 @@ public static class Theme
         BrushRecyclePoor.Freeze();
 
         BrushTransparent.Freeze();
+
+        // Panel brushes
+        BrushPanelBackground.Freeze();
+        BrushPanelBorder.Freeze();
+        BrushSectionHeader.Freeze();
+        BrushActiveIndicator.Freeze();
+        BrushCardBackground.Freeze();
+        BrushScannerEnabled.Freeze();
+        BrushScannerDisabled.Freeze();
     }
 }

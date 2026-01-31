@@ -75,3 +75,6 @@ ArcRaidersOverlay/Data/maps/*.jpg
 **/*.zip
 *.cursorindexingignore/**
 *.specstory/**
+
+# Tools cache (merge script downloads)
+Tools/cache/

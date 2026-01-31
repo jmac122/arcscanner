@@ -10,13 +10,16 @@ A lightweight, OCR-based external overlay tool for ARC Raiders, inspired by [Rat
 - **Event types** - Tracks Supply Drops, Storms, Convoys, and Extractions
 
 ### Item Scanner
-- **Cursor-based scanning** - Hover over item, press hotkey to scan (works anywhere on screen)
-- **OCR-based recognition** - Reads item names from tooltips using Tesseract OCR
+- **Dual recognition system** - Uses icon matching first, falls back to OCR for maximum accuracy
+- **Icon template matching** - Matches item icons using OpenCV with 360+ icon templates (inspired by [RatScanner](https://github.com/RatScanner/RatScanner))
+- **Edge-based matching** - Canny edge detection handles both selected (white) and unselected (dark) item backgrounds
+- **OCR fallback** - Tesseract OCR reads item names from tooltips when icon matching fails
+- **Resolution presets** - One-click setup for 1080p, 1440p, and 4K displays
 - **Instant recommendations** - Color-coded banners tell you to KEEP, SELL, or RECYCLE
 - **Recycling efficiency** - Shows percentage value (green 70%+, yellow 50-69%, red <50%)
 - **Workshop tracking** - Shows which workshops need each item (Gunsmith, Gear Bench, Medical Lab, Scrappy)
 - **Quest item warnings** - Orange highlight for items needed in quests
-- **68+ item database** - Comprehensive item data with sell values, recycle outputs, and uses
+- **370+ item database** - Comprehensive item data with sell values, recycle outputs, and uses
 
 ### Multi-Monitor Support
 - **Game window detection** - Automatically finds ARC Raiders on any monitor (detects `PioneerGame`, `ArcRaiders`, and variant process names)
@@ -51,7 +54,8 @@ That's it - everything is included. No additional downloads needed.
 ArcRaidersOverlay/
 ├── ArcRaidersOverlay.exe    ← Run this
 └── Data/
-    ├── items.json           ← Item database
+    ├── items.json           ← Item database (370+ items)
+    ├── icons/               ← Item icon templates (360+ icons for matching)
     ├── tessdata/
     │   └── eng.traineddata  ← OCR data (included)
     └── maps/
@@ -96,6 +100,23 @@ The `Data` folder is automatically copied to the output directory during build.
 1. **Launch the overlay** - Run `ArcRaidersOverlay.exe`
 2. **Start ARC Raiders** - Launch the game through Steam
 3. **Open Settings** - Right-click tray icon → Settings
+4. **Select your resolution** - Choose 1080p, 1440p, or 4K preset
+
+### Resolution Presets
+
+The overlay includes optimized presets for common resolutions:
+
+| Preset | Icon Size | Best For |
+|--------|-----------|----------|
+| **1080p** | 48px | 1920×1080 displays |
+| **1440p** | 62px | 2560×1440 displays |
+| **4K** | 96px | 3840×2160 displays |
+| **Custom** | User-defined | Non-standard setups |
+
+Select your preset in Settings → Scanner Settings → Resolution Preset. This automatically configures:
+- Scan region dimensions
+- Cursor offset positions
+- Icon template size for matching
 
 ### Calibrate Screen Regions
 
@@ -111,24 +132,29 @@ The overlay needs to know where to look for text on your screen:
 #### Item Scanner (No Calibration Needed)
 The item scanner uses **cursor-based detection** by default - it captures the area around your mouse cursor when you press the hotkey. This works anywhere on screen without calibration.
 
-**Optional:** If you prefer fixed-region scanning, disable "Scan at cursor position" in Settings to use the legacy calibration mode.
+**Tip:** For best icon matching accuracy, **click to select an item** before scanning. Selected items have a white background which matches the icon templates better.
 
-**Tip:** For best OCR accuracy, hover directly over the item name text when scanning.
+**Optional:** If you prefer fixed-region scanning, disable "Scan at cursor position" in Settings to use the legacy calibration mode.
 
 ### Settings Reference
 
 | Setting | Description | Default |
 |---------|-------------|---------|
+| **Resolution Preset** | Display resolution (1080p, 1440p, 4K, Custom) | 1080p |
 | **Use game-relative coordinates** | Stores calibration relative to game window position | On |
 | **Overlay follows game window** | Auto-positions overlay when game moves monitors | On |
 | **Overlay offset X/Y** | Fine-tune overlay position relative to game | 10, 10 |
 | **Start with Windows** | Launch overlay automatically on boot | Off |
 | **Start minimized** | Start minimized to system tray | Off |
 | **Event Poll Interval** | How often to scan for events (seconds) | 15 |
+| **Events Toggle Hotkey** | Hotkey to toggle events panel visibility | F8 |
+| **Overlay Toggle Hotkey** | Hotkey to toggle entire overlay visibility | F7 |
 | **Item Scan Hotkey** | Modifier keys + key to trigger item scan | Ctrl+Shift+S |
 | **Scan at cursor position** | Capture area around mouse cursor instead of fixed region | On |
-| **Scan Region Width** | Width of capture area when using cursor scanning | 500 |
-| **Scan Region Height** | Height of capture area when using cursor scanning | 300 |
+| **Scan Region Width** | Width of capture area when using cursor scanning | 400-700 (by preset) |
+| **Scan Region Height** | Height of capture area when using cursor scanning | 350-650 (by preset) |
+| **Scan Offset X/Y** | Offset from cursor to tooltip area | Varies by preset |
+| **Icon Size** | Size of inventory icons at current resolution | 48-96 (by preset) |
 | **Tessdata Path** | Location of Tesseract language files | ./Data/tessdata |
 
 ## Usage
@@ -137,13 +163,19 @@ The item scanner uses **cursor-based detection** by default - it captures the ar
 
 | Hotkey | Action |
 |--------|--------|
-| `Ctrl + Shift + S` | Scan item at cursor (default, configurable in Settings) |
+| `Ctrl + Shift + S` | Scan item at cursor (default, configurable) |
+| `F7` | Toggle overlay visibility (default, configurable) |
+| `F8` | Toggle events panel visibility (default, configurable) |
 | `Escape` | Cancel calibration |
 
 **How to scan items:**
-1. Hover your mouse over an item tooltip in-game
+1. **Click on an item** in your inventory to select it (white background = best accuracy)
 2. Press the scan hotkey (`Ctrl+Shift+S` by default)
 3. The overlay shows item info (value, recycle efficiency, recommendation)
+
+The scanner uses a dual recognition system:
+- **Icon matching (primary)** - Compares item icon against 360+ templates using OpenCV
+- **OCR fallback** - Reads item name from tooltip text if icon matching fails
 
 This works anywhere on screen - lobby, inventory, mid-match - no calibration needed.
 
@@ -222,11 +254,19 @@ Settings are stored in `%AppData%/ArcRaidersOverlay/config.json`
   "OverlayOffsetY": 10,
   "StartWithWindows": false,
   "StartMinimized": false,
+  "ShowEvents": true,
+  "EventsCompactMode": false,
+  "EventsToggleHotkeyKey": "F8",
+  "OverlayToggleHotkeyKey": "F7",
   "ScanHotkeyModifier": "Control,Shift",
   "ScanHotkeyKey": "S",
   "UseCursorBasedScanning": true,
+  "GameResolution": "1440p",
   "ScanRegionWidth": 500,
-  "ScanRegionHeight": 300
+  "ScanRegionHeight": 550,
+  "ScanOffsetX": 10,
+  "ScanOffsetY": -500,
+  "IconSize": 62
 }
 ```
 
@@ -277,11 +317,23 @@ Edit `Data/items.json` to add or modify items:
 
 | Aspect | Details |
 |--------|---------|
+| **Icon Matching** | OpenCV (OpenCvSharp4) template matching with Canny edge detection |
 | **OCR Engine** | Tesseract 5.x via NuGet package |
 | **Framework** | .NET 8.0 WPF |
 | **Screen Capture** | Win32 API (BitBlt) |
 | **Game Detection** | FindWindow + GetWindowRect |
 | **Build Output** | Self-contained single-file EXE |
+
+### How Icon Matching Works
+
+The scanner uses a RatScanner-inspired approach:
+
+1. **Capture region** - Captures a 3× icon-size area centered on your cursor
+2. **Template matching** - Uses OpenCV `MatchTemplate` with `CCoeffNormed` to find the best match
+3. **Edge-based fallback** - If pixel matching confidence is low (<70%), switches to Canny edge matching which is background-independent
+4. **OCR fallback** - If no icon matches above 50% confidence, falls back to reading the item name text via Tesseract OCR
+
+This dual approach provides robust recognition regardless of whether the item is selected (white background) or not (dark background).
 
 ### Safety & Anti-Cheat
 
@@ -324,9 +376,20 @@ This overlay is designed to be **external and passive**:
 ### Item Not Found in Database
 
 If an item isn't recognized:
-1. Check if OCR misread the name (common with similar letters)
-2. Add the item to `Data/items.json` manually
-3. The overlay uses fuzzy matching (60% similarity threshold)
+1. **Click to select the item** first - selected items (white background) match better
+2. Check if the icon template exists in `Data/icons/`
+3. Check if OCR misread the name (common with similar letters)
+4. Add the item to `Data/items.json` manually
+5. The overlay uses fuzzy matching (60% similarity threshold)
+
+### Icon Matching Issues
+
+| Problem | Solution |
+|---------|----------|
+| Low match confidence | Click item to select it (white background matches better) |
+| Wrong resolution preset | Change preset in Settings to match your display |
+| Icon not in database | Add icon PNG to `Data/icons/` folder |
+| Cursor blocking icon | Move cursor slightly; the scanner captures a large region |
 
 ### Screen Capture Not Working
 
@@ -358,6 +421,7 @@ ArcRaidersOverlay/
 │   ├── Item.cs                # Item data model
 │   ├── Event.cs               # Game event model
 │   └── MapInfo.cs             # Map configuration
+├── IconManager.cs             # Icon template matching (OpenCV)
 ├── OcrManager.cs              # Tesseract integration
 ├── ScreenCapture.cs           # Screen capture utilities
 ├── EventParser.cs             # Event text parsing
@@ -370,7 +434,8 @@ ArcRaidersOverlay/
 ├── GlobalUsings.cs            # Shared using directives
 ├── app.manifest               # UAC settings
 └── Data/
-    ├── items.json             # Item database (68+ items)
+    ├── items.json             # Item database (370+ items)
+    ├── icons/                 # Icon templates for matching (360+ PNGs)
     └── maps/
         └── maps.json          # Map definitions
 ```
@@ -416,7 +481,9 @@ This is an unofficial fan-made tool. It is **not** affiliated with, endorsed by,
 
 ## Credits
 
-- Inspired by [RatScanner](https://github.com/RatScanner/RatScanner) for Escape from Tarkov
+- Inspired by [RatScanner](https://github.com/RatScanner/RatScanner) for Escape from Tarkov (icon matching approach)
+- [OpenCvSharp](https://github.com/shimat/opencvsharp) for template matching and edge detection
 - [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) for text recognition
 - [Hardcodet.NotifyIcon.Wpf](https://github.com/hardcodet/wpf-notifyicon) for system tray integration
+- [RaidTheory](https://github.com/RaidTheory/arc-raiders-data) for item icons and database
 - ARC Raiders community for item data and cheat sheets

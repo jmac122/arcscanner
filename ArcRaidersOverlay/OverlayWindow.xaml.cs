@@ -380,10 +380,10 @@ public partial class OverlayWindow : Window, IDisposable
             UpdateEventsPanel(events);
 
             // Detect current map
-            var mapName = EventParser.DetectMap(text);
-            if (!string.IsNullOrEmpty(mapName))
+            var mapInfo = EventParser.DetectMapInfo(text);
+            if (mapInfo != null)
             {
-                LoadMinimap(mapName);
+                LoadMinimap(mapInfo);
             }
         }
         catch (Exception ex)
@@ -514,14 +514,21 @@ public partial class OverlayWindow : Window, IDisposable
 
     #region Minimap
 
-    private void LoadMinimap(string mapName)
+    private void LoadMinimap(MapInfo mapInfo)
     {
         Dispatcher.Invoke(() =>
         {
             try
             {
+                var mapName = mapInfo.Name;
+                var fileName = mapInfo.FileName;
+                if (string.IsNullOrWhiteSpace(fileName))
+                {
+                    fileName = $"{mapName.ToLowerInvariant().Replace(" ", "_")}.png";
+                }
+
                 var mapPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                    "Data", "maps", $"{mapName.ToLowerInvariant().Replace(" ", "_")}.png");
+                    "Data", "maps", fileName);
 
                 if (File.Exists(mapPath))
                 {

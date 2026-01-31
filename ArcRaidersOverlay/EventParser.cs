@@ -176,7 +176,7 @@ public static class EventParser
     /// Detects the current map from text (location names, map markers, etc.)
     /// Returns the map info if found, null otherwise.
     /// </summary>
-    private static MapInfo? DetectMapInfo(string text)
+    public static MapInfo? DetectMapInfo(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return null;

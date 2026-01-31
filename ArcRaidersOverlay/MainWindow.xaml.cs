@@ -67,11 +67,6 @@ public partial class MainWindow : Window, IDisposable
         _overlayWindow.OpenSettings();
     }
 
-    private void ScanItem_Click(object sender, RoutedEventArgs e)
-    {
-        // This is informational - hotkey handles actual scanning
-    }
-
     private void About_Click(object sender, RoutedEventArgs e)
     {
         var hotkeyText = _overlayWindow.GetScanHotkeyDisplayString();

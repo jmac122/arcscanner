@@ -284,16 +284,22 @@ public partial class OverlayWindow : Window, IDisposable
 
     /// <summary>
     /// Gets the actual screen region for capture, converting from game-relative if needed.
+    /// Returns false when conversion is required but no game window is detected.
     /// </summary>
-    private RegionConfig GetScreenRegion(RegionConfig configRegion)
+    private bool TryGetScreenRegion(RegionConfig configRegion, out RegionConfig screenRegion)
     {
-        if (_configManager?.Config.UseGameRelativeCoordinates == true &&
-            _gameWindowDetector?.CurrentWindow != null)
+        screenRegion = configRegion;
+        if (_configManager?.Config.UseGameRelativeCoordinates == true)
         {
-            return _gameWindowDetector.GameRelativeToScreen(configRegion);
+            if (_gameWindowDetector?.CurrentWindow == null)
+            {
+                return false;
+            }
+
+            screenRegion = _gameWindowDetector.GameRelativeToScreen(configRegion);
         }
 
-        return configRegion;
+        return true;
     }
 
     #endregion
@@ -311,7 +317,7 @@ public partial class OverlayWindow : Window, IDisposable
         try
         {
             var config = _configManager.Config;
-            if (config.EventsRegion.Width <= 0 || config.EventsRegion.Height <= 0)
+            if (!config.EventsRegion.IsValid)
             {
                 // No region configured - show placeholder
                 UpdateEventsPanel(new List<GameEvent>());
@@ -319,7 +325,11 @@ public partial class OverlayWindow : Window, IDisposable
             }
 
             // Capture events region (convert to screen coords if using game-relative)
-            var eventsRegion = GetScreenRegion(config.EventsRegion);
+            if (!TryGetScreenRegion(config.EventsRegion, out var eventsRegion))
+            {
+                UpdateEventsPanel(new List<GameEvent>());
+                return;
+            }
             using var bitmap = _screenCapture.CaptureRegion(eventsRegion);
             var text = _ocrManager.Recognize(bitmap);
 
@@ -520,14 +530,18 @@ public partial class OverlayWindow : Window, IDisposable
             UpdateScanStatus("Scanning...");
 
             var config = _configManager.Config;
-            if (config.TooltipRegion.Width <= 0 || config.TooltipRegion.Height <= 0)
+            if (!config.TooltipRegion.IsValid)
             {
                 UpdateScanStatus("Tooltip region not configured");
                 return;
             }
 
             // Capture tooltip region (convert to screen coords if using game-relative)
-            var tooltipRegion = GetScreenRegion(config.TooltipRegion);
+            if (!TryGetScreenRegion(config.TooltipRegion, out var tooltipRegion))
+            {
+                UpdateScanStatus("Game not detected");
+                return;
+            }
             using var bitmap = _screenCapture.CaptureRegion(tooltipRegion);
             var text = _ocrManager.Recognize(bitmap);
 

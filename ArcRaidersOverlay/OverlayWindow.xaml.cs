@@ -797,20 +797,23 @@ public partial class OverlayWindow : Window, IDisposable
             string matchSource = "";
             double matchConfidence = 0;
 
-            // Phase 1: Try icon matching first (capture icon area centered on cursor)
+            // Phase 1: Try icon matching first (capture larger region centered on cursor)
+            // RatScanner approach: capture 3x icon size, then search for icon within that region
             if (_iconManager?.IsReady == true && config.UseCursorBasedScanning)
             {
                 var iconSize = config.IconSize;
-                // Capture icon region centered on cursor with some padding
+                // Capture 3x icon size to ensure full icon is captured regardless of cursor position
+                // Must be larger than template size (96px) for MatchIconInRegion to work
+                var captureSize = Math.Max(iconSize * 3, 200);
                 var iconCapture = _screenCapture.CaptureTooltipAtCursor(
-                    iconSize + 20,  // Add padding for edge cases
-                    iconSize + 20,
-                    -(iconSize / 2) - 10,  // Center on cursor
-                    -(iconSize / 2) - 10);
+                    captureSize,
+                    captureSize,
+                    -captureSize / 2,  // Center on cursor
+                    -captureSize / 2);
 
                 using (iconCapture)
                 {
-                    LogMessage($"Icon capture: {iconCapture.Width}x{iconCapture.Height} centered on cursor");
+                    LogMessage($"Icon capture: {iconCapture.Width}x{iconCapture.Height} (3x icon size, centered on cursor)");
 
                     // Save icon debug image
                     try
@@ -823,8 +826,9 @@ public partial class OverlayWindow : Window, IDisposable
                     }
                     catch { }
 
-                    var (iconItemName, iconConf) = _iconManager.MatchIcon(iconCapture, config.IconSize);
-                    if (iconItemName != null && iconConf >= 0.7)
+                    // Use MatchIconInRegion to find the icon within the larger capture
+                    var (iconItemName, iconConf, iconLoc) = _iconManager.MatchIconInRegion(iconCapture);
+                    if (iconItemName != null && iconConf >= 0.6)
                     {
                         var iconItem = _dataManager.GetItem(iconItemName);
                         if (iconItem != null)
@@ -832,7 +836,7 @@ public partial class OverlayWindow : Window, IDisposable
                             foundItem = iconItem;
                             matchSource = $"Icon ({iconConf:P0})";
                             matchConfidence = iconConf;
-                            LogMessage($"Icon match: '{iconItemName}' ({iconConf:P0})");
+                            LogMessage($"Icon match: '{iconItemName}' at ({iconLoc.X},{iconLoc.Y}) ({iconConf:P0})");
                         }
                     }
                     else

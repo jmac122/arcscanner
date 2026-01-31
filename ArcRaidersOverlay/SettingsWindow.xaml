@@ -89,6 +89,12 @@
         <GroupBox Grid.Row="2" Header="Item Scanner" Foreground="White"
                   BorderBrush="#555555" Margin="0,0,0,15">
             <StackPanel Margin="10">
+                <!-- Tip for best results -->
+                <Border Background="#2a3a2a" CornerRadius="4" Padding="8" Margin="0,0,0,10">
+                    <TextBlock Text="Tip: Click to select an item before scanning for best accuracy"
+                               Foreground="#90EE90" FontSize="11" TextWrapping="Wrap"/>
+                </Border>
+
                 <!-- Resolution Preset -->
                 <TextBlock Text="Game Resolution:" Margin="0,0,0,5" FontWeight="SemiBold"/>
                 <Grid Margin="0,0,0,10">

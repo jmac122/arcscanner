@@ -30,6 +30,8 @@ public class ConfigManager
                 var config = JsonConvert.DeserializeObject<AppConfig>(json);
                 if (config != null)
                 {
+                    // Validate tessdata path - reset to default if invalid
+                    config.TessdataPath = ValidateTessdataPath(config.TessdataPath);
                     return config;
                 }
             }
@@ -41,6 +43,19 @@ public class ConfigManager
 
         // Return default config
         return CreateDefaultConfig();
+    }
+
+    private static string ValidateTessdataPath(string? savedPath)
+    {
+        var defaultPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "tessdata");
+
+        // If saved path is empty or doesn't exist, use default
+        if (string.IsNullOrWhiteSpace(savedPath) || !Directory.Exists(savedPath))
+        {
+            return defaultPath;
+        }
+
+        return savedPath;
     }
 
     public void Save()

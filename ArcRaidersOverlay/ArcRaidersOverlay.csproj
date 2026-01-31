@@ -19,6 +19,7 @@
     <Authors>ArcScanner</Authors>
     <Description>Lightweight overlay tool for ARC Raiders</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -439,9 +440,12 @@ public partial class OverlayWindow : Window, IDisposable
         Dispatcher.Invoke(() =>
         {
             EventsPanel.Children.Clear();
+            var isCompactMode = _configManager?.Config.EventsCompactMode ?? false;
 
             if (events.Count == 0)
             {
+                EventsPanel.Visibility = Visibility.Visible;
+                EventsCompactSummary.Visibility = Visibility.Collapsed;
                 EventsPanel.Children.Add(new TextBlock
                 {
                     Text = "No events detected",
@@ -453,53 +457,84 @@ public partial class OverlayWindow : Window, IDisposable
                 return;
             }
 
-            GameEvent? activeEvent = null;
-
-            foreach (var evt in events)
+            // Compact mode: show summary only
+            if (isCompactMode)
             {
-                var panel = new StackPanel { Orientation = Orientation.Horizontal };
+                EventsPanel.Visibility = Visibility.Collapsed;
+                EventsCompactSummary.Visibility = Visibility.Visible;
 
-                // Event icon based on type
-                var icon = new TextBlock
+                var activeCount = events.Count(e => e.Timer.Contains("ACTIVE"));
+                var nextEvent = events.FirstOrDefault(e => !e.Timer.Contains("ACTIVE"));
+
+                if (activeCount > 0)
                 {
-                    Text = GetEventIcon(evt.Name),
-                    Foreground = GetEventBrush(evt.Name),
-                    Margin = new Thickness(0, 0, 5, 0),
-                    FontSize = 11
-                };
-
-                var nameText = new TextBlock
+                    EventsCompactSummary.Text = $"{activeCount} active, {events.Count} total";
+                    EventsCompactSummary.Foreground = Theme.BrushTimerActive;
+                }
+                else if (nextEvent != null)
                 {
-                    Text = $"{evt.Name}",
-                    Style = (Style)FindResource("EventTextStyle")
-                };
-
-                var locationText = new TextBlock
+                    EventsCompactSummary.Text = $"{events.Count} events - next: {nextEvent.Name} {nextEvent.Timer}";
+                    EventsCompactSummary.Foreground = Theme.BrushTextSecondary;
+                }
+                else
                 {
-                    Text = $" @ {evt.Location}",
-                    Style = (Style)FindResource("EventTextStyle"),
-                    Foreground = Theme.BrushTextSecondary
-                };
+                    EventsCompactSummary.Text = $"{events.Count} events";
+                    EventsCompactSummary.Foreground = Theme.BrushTextSecondary;
+                }
+            }
+            else
+            {
+                EventsPanel.Visibility = Visibility.Visible;
+                EventsCompactSummary.Visibility = Visibility.Collapsed;
+            }
 
-                var timerText = new TextBlock
+            // Find active event for the banner
+            var activeEvent = events.FirstOrDefault(evt =>
+                evt.Timer.Contains("ACTIVE", StringComparison.OrdinalIgnoreCase) ||
+                evt.Timer.StartsWith("0:") || evt.Timer.StartsWith("1:"));
+
+            // Only build full event list if not in compact mode
+            if (!isCompactMode)
+            {
+                foreach (var evt in events)
                 {
-                    Text = $" [{evt.Timer}]",
-                    Style = (Style)FindResource("EventTextStyle"),
-                    Foreground = GetTimerBrush(evt.Timer)
-                };
+                    var panel = new StackPanel { Orientation = Orientation.Horizontal };
 
-                panel.Children.Add(icon);
-                panel.Children.Add(nameText);
-                panel.Children.Add(locationText);
-                panel.Children.Add(timerText);
+                    // Event icon based on type
+                    var icon = new TextBlock
+                    {
+                        Text = GetEventIcon(evt.Name),
+                        Foreground = GetEventBrush(evt.Name),
+                        Margin = new Thickness(0, 0, 5, 0),
+                        FontSize = 11
+                    };
 
-                EventsPanel.Children.Add(panel);
+                    var nameText = new TextBlock
+                    {
+                        Text = $"{evt.Name}",
+                        Style = (Style)FindResource("EventTextStyle")
+                    };
 
-                // Check if this event is active (timer shows "ACTIVE" or very low time)
-                if (evt.Timer.Contains("ACTIVE", StringComparison.OrdinalIgnoreCase) ||
-                    evt.Timer.StartsWith("0:") || evt.Timer.StartsWith("1:"))
-                {
-                    activeEvent = evt;
+                    var locationText = new TextBlock
+                    {
+                        Text = $" @ {evt.Location}",
+                        Style = (Style)FindResource("EventTextStyle"),
+                        Foreground = Theme.BrushTextSecondary
+                    };
+
+                    var timerText = new TextBlock
+                    {
+                        Text = $" [{evt.Timer}]",
+                        Style = (Style)FindResource("EventTextStyle"),
+                        Foreground = GetTimerBrush(evt.Timer)
+                    };
+
+                    panel.Children.Add(icon);
+                    panel.Children.Add(nameText);
+                    panel.Children.Add(locationText);
+                    panel.Children.Add(timerText);
+
+                    EventsPanel.Children.Add(panel);
                 }
             }
 

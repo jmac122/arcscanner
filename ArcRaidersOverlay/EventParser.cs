@@ -204,11 +204,8 @@ public static class EventParser
         // Remove extra whitespace
         text = Regex.Replace(text, @"\s+", " ").Trim();
 
-        // Fix common OCR errors
-        text = text
-            .Replace("0", "O") // Only in names, not numbers
-            .Replace("1", "l") // Only in names, context-dependent
-            .Replace("|", "I");
+        // Fix common OCR errors (only safe replacements - fuzzy matching handles the rest)
+        text = text.Replace("|", "I");
 
         // Capitalize first letter of each word
         text = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(text.ToLower());

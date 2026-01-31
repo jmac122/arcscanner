@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
+using WinForms = System.Windows.Forms;
 
 namespace ArcRaidersOverlay;
 
@@ -109,14 +110,16 @@ public partial class SettingsWindow : Window
 
     private void BrowseTessdata_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFolderDialog
+        using var dialog = new WinForms.FolderBrowserDialog
         {
-            Title = "Select Tessdata Folder"
+            Description = "Select Tessdata Folder",
+            UseDescriptionForTitle = true,
+            ShowNewFolderButton = false
         };
 
-        if (dialog.ShowDialog() == true)
+        if (dialog.ShowDialog() == WinForms.DialogResult.OK)
         {
-            TessdataPath.Text = dialog.FolderName;
+            TessdataPath.Text = dialog.SelectedPath;
         }
     }
 

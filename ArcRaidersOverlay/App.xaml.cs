@@ -84,23 +84,24 @@ public partial class App : Application
                 var processes = Process.GetProcessesByName(name);
                 foreach (var process in processes)
                 {
-                    try
+                    using (process)
                     {
-                        // Try to access the process - if we can't, it's likely elevated
-                        // and we're not (or we don't have permission)
-                        _ = process.MainModule;
-                        process.Dispose();
-                        return false; // We could access it, so it's not elevated (or we are too)
-                    }
-                    catch (System.ComponentModel.Win32Exception)
-                    {
-                        // Access denied - likely elevated
-                        process.Dispose();
-                        return true;
-                    }
-                    catch
-                    {
-                        process.Dispose();
+                        try
+                        {
+                            // Try to access the process - if we can't, it's likely elevated
+                            // and we're not (or we don't have permission)
+                            _ = process.MainModule;
+                            return false; // We could access it, so it's not elevated (or we are too)
+                        }
+                        catch (System.ComponentModel.Win32Exception)
+                        {
+                            // Access denied - likely elevated
+                            return true;
+                        }
+                        catch
+                        {
+                            // Ignore other errors and continue to next process
+                        }
                     }
                 }
             }

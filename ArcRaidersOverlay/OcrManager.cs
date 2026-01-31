@@ -1,4 +1,6 @@
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using Tesseract;
 
 namespace ArcRaidersOverlay;
@@ -55,29 +57,55 @@ public class OcrManager : IDisposable
 
     private static Bitmap PreprocessImage(Bitmap source)
     {
-        // Create a copy to avoid modifying the original
-        var result = new Bitmap(source.Width, source.Height);
+        // Create result bitmap with same dimensions and pixel format
+        var result = new Bitmap(source.Width, source.Height, PixelFormat.Format32bppArgb);
+        var rect = new Rectangle(0, 0, source.Width, source.Height);
 
-        using var graphics = Graphics.FromImage(result);
-        graphics.DrawImage(source, 0, 0);
+        BitmapData? sourceData = null;
+        BitmapData? resultData = null;
 
-        // Apply simple contrast enhancement for better OCR
-        // This is a basic implementation - could be improved with proper image processing
-        for (int y = 0; y < result.Height; y++)
+        try
         {
-            for (int x = 0; x < result.Width; x++)
+            // Lock bits for direct memory access (much faster than GetPixel/SetPixel)
+            sourceData = source.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            resultData = result.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            int byteCount = sourceData.Stride * source.Height;
+            byte[] pixels = new byte[byteCount];
+
+            // Copy source pixels to array
+            Marshal.Copy(sourceData.Scan0, pixels, 0, byteCount);
+
+            // Process pixels - apply contrast enhancement for OCR
+            // Format is BGRA (4 bytes per pixel)
+            for (int i = 0; i < byteCount; i += 4)
             {
-                var pixel = result.GetPixel(x, y);
+                byte b = pixels[i];
+                byte g = pixels[i + 1];
+                byte r = pixels[i + 2];
+                // Alpha at pixels[i + 3] is preserved
 
                 // Calculate luminance
-                var luminance = (0.299 * pixel.R + 0.587 * pixel.G + 0.114 * pixel.B);
+                var luminance = 0.299 * r + 0.587 * g + 0.114 * b;
 
-                // Increase contrast - if above threshold, make white; otherwise make black
-                // This helps with game UI text which often has semi-transparent backgrounds
-                var newValue = luminance > 128 ? 255 : 0;
+                // Threshold to black or white for better OCR
+                var newValue = (byte)(luminance > 128 ? 255 : 0);
 
-                result.SetPixel(x, y, Color.FromArgb(newValue, newValue, newValue));
+                pixels[i] = newValue;     // B
+                pixels[i + 1] = newValue; // G
+                pixels[i + 2] = newValue; // R
+                // Alpha unchanged
             }
+
+            // Copy processed pixels to result
+            Marshal.Copy(pixels, 0, resultData.Scan0, byteCount);
+        }
+        finally
+        {
+            if (sourceData != null)
+                source.UnlockBits(sourceData);
+            if (resultData != null)
+                result.UnlockBits(resultData);
         }
 
         return result;

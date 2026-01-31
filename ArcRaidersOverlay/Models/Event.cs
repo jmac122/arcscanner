@@ -8,23 +8,7 @@ public class GameEvent
 
     public bool IsActive => Timer.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase);
 
-    public TimeSpan? TimeRemaining
-    {
-        get
-        {
-            if (IsActive) return TimeSpan.Zero;
-
-            var parts = Timer.Split(':');
-            if (parts.Length == 2 &&
-                int.TryParse(parts[0], out var minutes) &&
-                int.TryParse(parts[1], out var seconds))
-            {
-                return new TimeSpan(0, minutes, seconds);
-            }
-
-            return null;
-        }
-    }
+    public TimeSpan? TimeRemaining => EventParser.ParseTimer(Timer);
 
     public EventType Type
     {

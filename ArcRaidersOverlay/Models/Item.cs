@@ -77,25 +77,3 @@ public class Item
     [JsonProperty("imageUrl")]
     public string? ImageUrl { get; set; }
 }
-
-public enum ItemRarity
-{
-    Common,
-    Uncommon,
-    Rare,
-    Epic,
-    Legendary
-}
-
-public enum ItemCategory
-{
-    Weapon,
-    Armor,
-    Consumable,
-    Material,
-    Component,
-    Ammo,
-    Tool,
-    Quest,
-    Misc
-}

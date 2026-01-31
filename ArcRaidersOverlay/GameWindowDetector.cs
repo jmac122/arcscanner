@@ -79,15 +79,6 @@ public class GameWindowDetector : IDisposable
         "PioneerGame"
     };
 
-    // Known process names (PioneerGame is the actual exe name)
-    private static readonly string[] GameProcessNames =
-    {
-        "PioneerGame",
-        "PioneerGame-Win64-Shipping",
-        "ArcRaiders",
-        "ArcRaiders-Win64-Shipping"
-    };
-
     private IntPtr _gameWindowHandle;
     private readonly System.Windows.Threading.DispatcherTimer _pollTimer;
     private bool _disposed;
@@ -184,17 +175,19 @@ public class GameWindowDetector : IDisposable
         // Try finding by process name
         IntPtr foundHwnd = IntPtr.Zero;
 
-        foreach (var processName in GameProcessNames)
+        foreach (var processName in GameProcessNames.Known)
         {
             try
             {
                 var processes = Process.GetProcessesByName(processName.Replace(" ", ""));
                 foreach (var process in processes)
                 {
-                    if (process.MainWindowHandle != IntPtr.Zero)
+                    using (process)
                     {
-                        foundHwnd = process.MainWindowHandle;
-                        break;
+                        if (foundHwnd == IntPtr.Zero && process.MainWindowHandle != IntPtr.Zero)
+                        {
+                            foundHwnd = process.MainWindowHandle;
+                        }
                     }
                 }
 

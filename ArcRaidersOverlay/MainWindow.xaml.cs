@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Windows;
+using System.Windows.Input;
 using Hardcodet.Wpf.TaskbarNotification;
 
 namespace ArcRaidersOverlay;
@@ -9,11 +10,15 @@ public partial class MainWindow : Window, IDisposable
     private readonly OverlayWindow _overlayWindow;
     private bool _disposed;
 
+    public ICommand ToggleOverlayCommand { get; }
+
     public MainWindow(OverlayWindow overlayWindow)
     {
         InitializeComponent();
 
         _overlayWindow = overlayWindow;
+        ToggleOverlayCommand = new DelegateCommand(() => _overlayWindow.ToggleVisibility());
+        DataContext = this;
 
         // Set a default icon if app.ico doesn't exist
         try
@@ -93,5 +98,25 @@ public partial class MainWindow : Window, IDisposable
 
         TrayIcon.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    private sealed class DelegateCommand : ICommand
+    {
+        private readonly Action _execute;
+
+        public DelegateCommand(Action execute)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+        }
+
+        public bool CanExecute(object? parameter) => true;
+
+        public void Execute(object? parameter) => _execute();
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
     }
 }

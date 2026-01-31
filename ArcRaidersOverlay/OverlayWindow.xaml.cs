@@ -38,7 +38,6 @@ public partial class OverlayWindow : Window, IDisposable
     private bool _isLocked;
     private bool _isClickThrough;
     private bool _disposed;
-    private bool _isFollowingGame;
 
     public OverlayWindow()
     {
@@ -68,6 +67,9 @@ public partial class OverlayWindow : Window, IDisposable
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        _isLocked = true;
+        LockButton.Content = "Unlock";
+
         // Make window click-through
         SetClickThrough(true);
 
@@ -249,7 +251,6 @@ public partial class OverlayWindow : Window, IDisposable
 
         Left = pos.X;
         Top = pos.Y;
-        _isFollowingGame = true;
     }
 
     private void UpdateGameStatus()

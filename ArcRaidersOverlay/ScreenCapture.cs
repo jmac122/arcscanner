@@ -32,28 +32,4 @@ public class ScreenCapture
     {
         return CaptureRegion(new Rectangle(config.X, config.Y, config.Width, config.Height));
     }
-
-    /// <summary>
-    /// Captures the primary screen.
-    /// </summary>
-    public Bitmap CaptureFullScreen()
-    {
-        var screenWidth = (int)System.Windows.SystemParameters.PrimaryScreenWidth;
-        var screenHeight = (int)System.Windows.SystemParameters.PrimaryScreenHeight;
-
-        return CaptureRegion(new Rectangle(0, 0, screenWidth, screenHeight));
-    }
-
-    /// <summary>
-    /// Captures all screens (virtual screen).
-    /// </summary>
-    public Bitmap CaptureAllScreens()
-    {
-        var virtualWidth = (int)System.Windows.SystemParameters.VirtualScreenWidth;
-        var virtualHeight = (int)System.Windows.SystemParameters.VirtualScreenHeight;
-        var virtualLeft = (int)System.Windows.SystemParameters.VirtualScreenLeft;
-        var virtualTop = (int)System.Windows.SystemParameters.VirtualScreenTop;
-
-        return CaptureRegion(new Rectangle(virtualLeft, virtualTop, virtualWidth, virtualHeight));
-    }
 }

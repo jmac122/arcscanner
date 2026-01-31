@@ -75,7 +75,7 @@ public partial class App : Application
     /// </summary>
     private static bool IsGameRunningElevated()
     {
-        var gameProcessNames = new[] { "PioneerGame", "PioneerGame-Win64-Shipping", "ArcRaiders" };
+        var gameProcessNames = GameProcessNames.Known;
 
         foreach (var name in gameProcessNames)
         {

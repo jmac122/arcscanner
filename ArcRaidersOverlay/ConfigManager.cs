@@ -153,16 +153,7 @@ public class AppConfig
     {
         get
         {
-            if (string.IsNullOrEmpty(EventsToggleHotkeyModifier))
-                return ModifierKeys.None;
-
-            ModifierKeys result = ModifierKeys.None;
-            foreach (var part in EventsToggleHotkeyModifier.Split(','))
-            {
-                if (Enum.TryParse<ModifierKeys>(part.Trim(), out var mod))
-                    result |= mod;
-            }
-            return result;
+            return ParseModifierKeys(EventsToggleHotkeyModifier, ModifierKeys.None);
         }
     }
 
@@ -198,16 +189,7 @@ public class AppConfig
     {
         get
         {
-            if (string.IsNullOrEmpty(OverlayToggleHotkeyModifier))
-                return ModifierKeys.None;
-
-            ModifierKeys result = ModifierKeys.None;
-            foreach (var part in OverlayToggleHotkeyModifier.Split(','))
-            {
-                if (Enum.TryParse<ModifierKeys>(part.Trim(), out var mod))
-                    result |= mod;
-            }
-            return result;
+            return ParseModifierKeys(OverlayToggleHotkeyModifier, ModifierKeys.None);
         }
     }
 
@@ -354,17 +336,23 @@ public class AppConfig
     {
         get
         {
-            if (string.IsNullOrEmpty(ScanHotkeyModifier))
-                return ModifierKeys.Control | ModifierKeys.Shift;
-
-            ModifierKeys result = ModifierKeys.None;
-            foreach (var part in ScanHotkeyModifier.Split(','))
-            {
-                if (Enum.TryParse<ModifierKeys>(part.Trim(), out var mod))
-                    result |= mod;
-            }
-            return result == ModifierKeys.None ? ModifierKeys.Control | ModifierKeys.Shift : result;
+            return ParseModifierKeys(ScanHotkeyModifier, ModifierKeys.Control | ModifierKeys.Shift);
         }
+    }
+
+    private static ModifierKeys ParseModifierKeys(string? modifierValue, ModifierKeys fallbackValue)
+    {
+        if (string.IsNullOrWhiteSpace(modifierValue))
+            return fallbackValue;
+
+        ModifierKeys result = ModifierKeys.None;
+        foreach (var part in modifierValue.Split(','))
+        {
+            if (Enum.TryParse<ModifierKeys>(part.Trim(), out var mod))
+                result |= mod;
+        }
+
+        return result == ModifierKeys.None ? fallbackValue : result;
     }
 
     /// <summary>

@@ -475,24 +475,24 @@ public partial class OverlayWindow : Window, IDisposable
         });
     }
 
-    private static string GetEventIcon(string eventName)
+    private static (string Icon, SolidColorBrush Brush) GetEventVisual(string eventName)
     {
         var lower = eventName.ToLowerInvariant();
-        if (lower.Contains("drop")) return "[D]";
-        if (lower.Contains("storm")) return "[S]";
-        if (lower.Contains("convoy")) return "[C]";
-        if (lower.Contains("extraction")) return "[E]";
-        return "[*]";
+        if (lower.Contains("drop")) return ("[D]", Theme.BrushEventDrop);
+        if (lower.Contains("storm")) return ("[S]", Theme.BrushEventStorm);
+        if (lower.Contains("convoy")) return ("[C]", Theme.BrushEventConvoy);
+        if (lower.Contains("extraction")) return ("[E]", Theme.BrushEventExtraction);
+        return ("[*]", Theme.BrushTextDefault);
+    }
+
+    private static string GetEventIcon(string eventName)
+    {
+        return GetEventVisual(eventName).Icon;
     }
 
     private static SolidColorBrush GetEventBrush(string eventName)
     {
-        var lower = eventName.ToLowerInvariant();
-        if (lower.Contains("drop")) return Theme.BrushEventDrop;
-        if (lower.Contains("storm")) return Theme.BrushEventStorm;
-        if (lower.Contains("convoy")) return Theme.BrushEventConvoy;
-        if (lower.Contains("extraction")) return Theme.BrushEventExtraction;
-        return Theme.BrushTextDefault;
+        return GetEventVisual(eventName).Brush;
     }
 
     private static SolidColorBrush GetTimerBrush(string timer)

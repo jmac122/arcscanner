@@ -167,27 +167,27 @@ public partial class SettingsWindow : Window
         HotkeyAlt.IsChecked = modifiers.HasFlag(ModifierKeys.Alt);
 
         var key = config.ScanKey;
-        for (int i = 0; i < HotkeyKey.Items.Count; i++)
-        {
-            if (HotkeyKey.Items[i] is ComboBoxItem item && item.Tag is Key itemKey && itemKey == key)
-            {
-                HotkeyKey.SelectedIndex = i;
-                break;
-            }
-        }
+        SelectHotkeyKey(key);
 
         // Default to S if not found
         if (HotkeyKey.SelectedIndex < 0)
         {
-            for (int i = 0; i < HotkeyKey.Items.Count; i++)
+            SelectHotkeyKey(Key.S);
+        }
+    }
+
+    private bool SelectHotkeyKey(Key targetKey)
+    {
+        for (int i = 0; i < HotkeyKey.Items.Count; i++)
+        {
+            if (HotkeyKey.Items[i] is ComboBoxItem item && item.Tag is Key itemKey && itemKey == targetKey)
             {
-                if (HotkeyKey.Items[i] is ComboBoxItem item && item.Tag is Key itemKey && itemKey == Key.S)
-                {
-                    HotkeyKey.SelectedIndex = i;
-                    break;
-                }
+                HotkeyKey.SelectedIndex = i;
+                return true;
             }
         }
+
+        return false;
     }
 
     private (ModifierKeys modifiers, Key key) GetSelectedHotkey()
@@ -275,8 +275,16 @@ public partial class SettingsWindow : Window
 
             // Item scanner settings
             config.UseCursorBasedScanning = UseCursorScanning.IsChecked ?? true;
-            config.ScanRegionWidth = int.Parse(ScanRegionWidth.Text);
-            config.ScanRegionHeight = int.Parse(ScanRegionHeight.Text);
+            var scanRegionWidth = int.Parse(ScanRegionWidth.Text);
+            var scanRegionHeight = int.Parse(ScanRegionHeight.Text);
+            if (scanRegionWidth <= 0 || scanRegionHeight <= 0)
+            {
+                MessageBox.Show("Scan region width and height must be positive values.",
+                    "Invalid Scan Region", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            config.ScanRegionWidth = scanRegionWidth;
+            config.ScanRegionHeight = scanRegionHeight;
 
             // Game detection settings
             config.UseGameRelativeCoordinates = UseGameRelative.IsChecked ?? true;

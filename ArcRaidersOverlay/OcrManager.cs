@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Tesseract;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace ArcRaidersOverlay;
 

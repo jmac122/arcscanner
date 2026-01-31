@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Drawing.Imaging;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace ArcRaidersOverlay;
 

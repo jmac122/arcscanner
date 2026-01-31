@@ -1,116 +1,433 @@
 [
   {
+    "name": "Rubber Parts",
+    "category": "Component",
+    "rarity": "Common",
+    "value": 45,
+    "description": "Base component used in many workshop upgrades. High priority - keep!",
+    "weight": 0.3,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": ["Gear Bench", "Scrappy"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["All Maps", "Vehicle Wrecks", "Industrial Sites"]
+  },
+  {
+    "name": "Fabric",
+    "category": "Component",
+    "rarity": "Common",
+    "value": 35,
+    "description": "Base component for gear crafting. High priority - keep!",
+    "weight": 0.2,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": ["Gear Bench", "Medical Lab"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["All Maps", "Residential Areas", "Clothing Stores"]
+  },
+  {
+    "name": "Durable Cloth",
+    "category": "Component",
+    "rarity": "Uncommon",
+    "value": 85,
+    "description": "Upgraded fabric component. High priority for gear upgrades - keep!",
+    "weight": 0.2,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": ["Gear Bench"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Military Sites", "Supply Drops"]
+  },
+  {
+    "name": "Metal Parts",
+    "category": "Component",
+    "rarity": "Common",
+    "value": 55,
+    "description": "Base component used extensively in weapon crafting. High priority - keep!",
+    "weight": 0.5,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": ["Gunsmith", "Scrappy"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["All Maps", "Industrial Sites", "Scrap Yards"]
+  },
+  {
+    "name": "Advanced Mechanical Components",
+    "category": "Component",
+    "rarity": "Rare",
+    "value": 450,
+    "description": "High-tier component for advanced crafting. Very high priority - always keep!",
+    "weight": 0.4,
+    "stackSize": 20,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["Advanced Weapons", "Vehicle Repairs"],
+    "workshopUses": ["Gunsmith", "Scrappy"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["High-Security Areas", "ARC Facilities", "Elite Crates"]
+  },
+  {
+    "name": "Advanced Electrical Components",
+    "category": "Component",
+    "rarity": "Rare",
+    "value": 480,
+    "description": "High-tier electronic component. Very high priority - always keep!",
+    "weight": 0.3,
+    "stackSize": 20,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["Tech Upgrades", "Scanner Improvements"],
+    "workshopUses": ["Gunsmith", "Medical Lab"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Tech Facilities", "ARC Facilities", "Supply Drops"]
+  },
+  {
+    "name": "Basic Tools",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 60,
+    "description": "Common tools found everywhere. Safe to sell or recycle.",
+    "weight": 0.8,
+    "stackSize": 30,
+    "recycleValuePercent": 85,
+    "recycleOutputs": {
+      "Metal Parts": 2
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["All Maps", "Garages", "Tool Sheds"]
+  },
+  {
+    "name": "Broken Electronics",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 70,
+    "description": "Damaged electronic devices. Safe to recycle for components.",
+    "weight": 0.4,
+    "stackSize": 30,
+    "recycleValuePercent": 92,
+    "recycleOutputs": {
+      "Advanced Electrical Components": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Tech Facilities", "Offices", "Residential"]
+  },
+  {
+    "name": "Old Phone",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 45,
+    "description": "Obsolete communication device. Good recycling value.",
+    "weight": 0.2,
+    "stackSize": 50,
+    "recycleValuePercent": 88,
+    "recycleOutputs": {
+      "Advanced Electrical Components": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Offices", "Residential", "All Maps"]
+  },
+  {
     "name": "Scrap Metal",
     "category": "Material",
     "rarity": "Common",
     "value": 50,
-    "description": "Basic salvaged metal, useful for crafting and repairs.",
+    "description": "Basic salvaged metal. Safe to recycle for Metal Parts.",
     "weight": 0.5,
     "stackSize": 100,
+    "recycleValuePercent": 78,
     "recycleOutputs": {
-      "Iron": 2,
-      "Carbon": 1
+      "Metal Parts": 2
     },
-    "projectUses": [
-      "Basic Repairs",
-      "Metal Plating",
-      "Ammo Crafting"
-    ],
-    "foundIn": [
-      "Dread Canyon",
-      "Blackstone Quarry",
-      "All Maps"
-    ]
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["All Maps", "Scrap Yards", "Industrial"]
   },
   {
-    "name": "Circuit Board",
-    "category": "Component",
+    "name": "Car Battery",
+    "category": "Material",
     "rarity": "Uncommon",
-    "value": 250,
-    "description": "Salvaged electronics, essential for tech upgrades.",
-    "weight": 0.2,
-    "stackSize": 50,
+    "value": 180,
+    "description": "Vehicle battery, good recycle value for electrical components.",
+    "weight": 2.0,
+    "stackSize": 10,
+    "recycleValuePercent": 75,
     "recycleOutputs": {
-      "Copper": 3,
-      "Silicon": 2,
-      "Gold": 1
+      "Advanced Electrical Components": 2,
+      "Metal Parts": 1
     },
-    "projectUses": [
-      "Scanner Upgrade",
-      "Comm Device",
-      "Drone Repair"
-    ],
-    "foundIn": [
-      "Tech Facilities",
-      "Supply Drops"
-    ]
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Garages", "Vehicle Wrecks", "Industrial"]
   },
   {
-    "name": "Energy Cell",
-    "category": "Component",
-    "rarity": "Uncommon",
-    "value": 300,
-    "description": "Portable power source for various equipment.",
-    "weight": 0.8,
-    "stackSize": 20,
-    "recycleOutputs": {
-      "Lithium": 2,
-      "Copper": 2
-    },
-    "projectUses": [
-      "Shield Generator",
-      "Flashlight Upgrade",
-      "Power Tools"
-    ],
-    "foundIn": [
-      "Power Stations",
-      "ARC Facilities"
-    ]
-  },
-  {
-    "name": "Polymer Sheet",
+    "name": "Duct Tape",
     "category": "Material",
     "rarity": "Common",
-    "value": 75,
-    "description": "Flexible synthetic material for armor and construction.",
-    "weight": 0.3,
-    "stackSize": 100,
+    "value": 40,
+    "description": "Universal repair material. Moderate recycle value.",
+    "weight": 0.2,
+    "stackSize": 50,
+    "recycleValuePercent": 65,
     "recycleOutputs": {
-      "Plastic": 3,
-      "Carbon Fiber": 1
+      "Fabric": 1,
+      "Rubber Parts": 1
     },
-    "projectUses": [
-      "Armor Crafting",
-      "Container Repair",
-      "Insulation"
-    ],
-    "foundIn": [
-      "Industrial Sites",
-      "All Maps"
-    ]
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Either",
+    "foundIn": ["All Maps", "Hardware Stores"]
   },
   {
-    "name": "Titan Core Fragment",
-    "category": "Component",
-    "rarity": "Epic",
-    "value": 2500,
-    "description": "A fragment from an ARC Titan's power core. Extremely valuable.",
-    "weight": 2.0,
-    "stackSize": 5,
+    "name": "Wire Spool",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 55,
+    "description": "Copper wiring on a spool. Good electrical component source.",
+    "weight": 0.5,
+    "stackSize": 40,
+    "recycleValuePercent": 82,
     "recycleOutputs": {
-      "Exotic Alloy": 1,
-      "Energy Crystal": 2,
-      "Titanium": 5
+      "Advanced Electrical Components": 1
     },
-    "projectUses": [
-      "Advanced Weapons",
-      "Titan Armor",
-      "Experimental Tech"
-    ],
-    "foundIn": [
-      "Titan Boss",
-      "High-Security Areas"
-    ]
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Construction Sites", "Industrial"]
+  },
+  {
+    "name": "Tire",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 65,
+    "description": "Vehicle tire. Excellent source of Rubber Parts.",
+    "weight": 3.0,
+    "stackSize": 10,
+    "recycleValuePercent": 90,
+    "recycleOutputs": {
+      "Rubber Parts": 3
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Garages", "Vehicle Wrecks", "Gas Stations"]
+  },
+  {
+    "name": "Leather Jacket",
+    "category": "Material",
+    "rarity": "Uncommon",
+    "value": 120,
+    "description": "Worn leather jacket. Great for fabric and durable cloth.",
+    "weight": 0.8,
+    "stackSize": 20,
+    "recycleValuePercent": 85,
+    "recycleOutputs": {
+      "Durable Cloth": 2,
+      "Fabric": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Clothing Stores", "Residential"]
+  },
+  {
+    "name": "Backpack",
+    "category": "Material",
+    "rarity": "Uncommon",
+    "value": 95,
+    "description": "Old backpack. Good source of fabric materials.",
+    "weight": 0.5,
+    "stackSize": 20,
+    "recycleValuePercent": 80,
+    "recycleOutputs": {
+      "Fabric": 2,
+      "Durable Cloth": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Residential", "Schools", "Offices"]
+  },
+  {
+    "name": "Motor",
+    "category": "Material",
+    "rarity": "Uncommon",
+    "value": 220,
+    "description": "Electric motor. Excellent for mechanical components.",
+    "weight": 2.5,
+    "stackSize": 10,
+    "recycleValuePercent": 88,
+    "recycleOutputs": {
+      "Advanced Mechanical Components": 2,
+      "Metal Parts": 2
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Industrial", "Workshops", "Garages"]
+  },
+  {
+    "name": "Generator Parts",
+    "category": "Material",
+    "rarity": "Rare",
+    "value": 350,
+    "description": "Salvaged generator components. High-value recycle.",
+    "weight": 3.0,
+    "stackSize": 5,
+    "recycleValuePercent": 85,
+    "recycleOutputs": {
+      "Advanced Mechanical Components": 2,
+      "Advanced Electrical Components": 2,
+      "Metal Parts": 3
+    },
+    "projectUses": ["Power Grid"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Power Stations", "Industrial"]
+  },
+  {
+    "name": "Gold Watch",
+    "category": "Valuable",
+    "rarity": "Rare",
+    "value": 550,
+    "description": "Luxury watch. Better to sell than recycle.",
+    "weight": 0.1,
+    "stackSize": 20,
+    "recycleValuePercent": 35,
+    "recycleOutputs": {
+      "Metal Parts": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["Residential", "Banks", "Jewelry Stores"]
+  },
+  {
+    "name": "Jewelry",
+    "category": "Valuable",
+    "rarity": "Rare",
+    "value": 480,
+    "description": "Assorted jewelry. Much better value when sold.",
+    "weight": 0.1,
+    "stackSize": 30,
+    "recycleValuePercent": 28,
+    "recycleOutputs": {
+      "Metal Parts": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["Residential", "Jewelry Stores"]
+  },
+  {
+    "name": "Cash Stack",
+    "category": "Valuable",
+    "rarity": "Common",
+    "value": 200,
+    "description": "Bundle of old currency. Cannot be recycled.",
+    "weight": 0.1,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["Banks", "Cash Registers", "Safes"]
+  },
+  {
+    "name": "Antique",
+    "category": "Valuable",
+    "rarity": "Epic",
+    "value": 1200,
+    "description": "Valuable antique item. Always sell - never recycle!",
+    "weight": 0.5,
+    "stackSize": 10,
+    "recycleValuePercent": 15,
+    "recycleOutputs": {
+      "Metal Parts": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["Museums", "Mansions", "Antique Shops"]
+  },
+  {
+    "name": "Rare Coin",
+    "category": "Valuable",
+    "rarity": "Epic",
+    "value": 800,
+    "description": "Collectible coin. Much more valuable when sold.",
+    "weight": 0.05,
+    "stackSize": 50,
+    "recycleValuePercent": 12,
+    "recycleOutputs": {
+      "Metal Parts": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["Banks", "Museums", "Safes"]
   },
   {
     "name": "Medical Supplies",
@@ -120,202 +437,873 @@
     "description": "Basic medical kit for treating injuries.",
     "weight": 0.5,
     "stackSize": 10,
+    "recycleValuePercent": null,
     "recycleOutputs": null,
     "projectUses": [],
-    "foundIn": [
-      "Medical Facilities",
-      "Supply Crates",
-      "All Maps"
-    ]
+    "workshopUses": ["Medical Lab"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Medical Facilities", "Pharmacies", "All Maps"]
   },
   {
-    "name": "Combat Stim",
-    "category": "Consumable",
-    "rarity": "Rare",
-    "value": 500,
-    "description": "Adrenaline booster that temporarily enhances combat abilities.",
-    "weight": 0.2,
-    "stackSize": 5,
+    "name": "Gunsmith Tools",
+    "category": "Component",
+    "rarity": "Uncommon",
+    "value": 250,
+    "description": "Specialized tools for weapon maintenance. Keep for Gunsmith upgrades.",
+    "weight": 1.0,
+    "stackSize": 10,
+    "recycleValuePercent": 55,
+    "recycleOutputs": {
+      "Metal Parts": 3
+    },
+    "projectUses": [],
+    "workshopUses": ["Gunsmith"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Gun Shops", "Military Sites", "Armories"]
+  },
+  {
+    "name": "Weapon Parts",
+    "category": "Component",
+    "rarity": "Uncommon",
+    "value": 180,
+    "description": "Salvaged weapon components. Essential for Gunsmith.",
+    "weight": 0.6,
+    "stackSize": 30,
+    "recycleValuePercent": 70,
+    "recycleOutputs": {
+      "Metal Parts": 2,
+      "Advanced Mechanical Components": 1
+    },
+    "projectUses": [],
+    "workshopUses": ["Gunsmith"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Military Sites", "Gun Shops", "Supply Drops"]
+  },
+  {
+    "name": "Chemical Compounds",
+    "category": "Component",
+    "rarity": "Uncommon",
+    "value": 165,
+    "description": "Laboratory chemicals. Keep for Medical Lab upgrades.",
+    "weight": 0.4,
+    "stackSize": 30,
+    "recycleValuePercent": null,
     "recycleOutputs": null,
     "projectUses": [],
-    "foundIn": [
-      "Military Sites",
-      "Supply Drops"
-    ]
+    "workshopUses": ["Medical Lab"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Labs", "Hospitals", "Pharmacies"]
   },
   {
-    "name": "Fiber Optic Cable",
+    "name": "Vehicle Scrap",
     "category": "Material",
+    "rarity": "Common",
+    "value": 75,
+    "description": "Salvaged vehicle parts. Good for Scrappy workshop.",
+    "weight": 2.0,
+    "stackSize": 20,
+    "recycleValuePercent": 82,
+    "recycleOutputs": {
+      "Metal Parts": 3,
+      "Rubber Parts": 1
+    },
+    "projectUses": [],
+    "workshopUses": ["Scrappy"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Either",
+    "foundIn": ["Garages", "Vehicle Wrecks", "Scrap Yards"]
+  },
+  {
+    "name": "Engine Parts",
+    "category": "Component",
+    "rarity": "Rare",
+    "value": 380,
+    "description": "Salvaged engine components. Keep for Scrappy workshop!",
+    "weight": 3.0,
+    "stackSize": 10,
+    "recycleValuePercent": 72,
+    "recycleOutputs": {
+      "Advanced Mechanical Components": 3,
+      "Metal Parts": 2
+    },
+    "projectUses": ["Vehicle Repairs"],
+    "workshopUses": ["Scrappy"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Garages", "Industrial", "Vehicle Wrecks"]
+  },
+  {
+    "name": "Dog Tags",
+    "category": "Quest",
+    "rarity": "Uncommon",
+    "value": 50,
+    "description": "Military identification tags. KEEP FOR QUESTS!",
+    "weight": 0.05,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": true,
+    "questUses": ["Fallen Soldiers", "Memorial"],
+    "recommendation": "Keep",
+    "foundIn": ["Military Sites", "Barracks"]
+  },
+  {
+    "name": "USB Drive",
+    "category": "Quest",
+    "rarity": "Uncommon",
+    "value": 85,
+    "description": "Data storage device. KEEP FOR QUESTS!",
+    "weight": 0.05,
+    "stackSize": 30,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": true,
+    "questUses": ["Data Recovery", "Intelligence"],
+    "recommendation": "Keep",
+    "foundIn": ["Offices", "Tech Facilities", "ARC Sites"]
+  },
+  {
+    "name": "Photo Album",
+    "category": "Quest",
+    "rarity": "Rare",
+    "value": 120,
+    "description": "Family photo collection. KEEP FOR QUESTS!",
+    "weight": 0.3,
+    "stackSize": 10,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": true,
+    "questUses": ["Family Memories", "Survivor Stories"],
+    "recommendation": "Keep",
+    "foundIn": ["Residential", "Schools"]
+  },
+  {
+    "name": "Military Documents",
+    "category": "Quest",
+    "rarity": "Rare",
+    "value": 180,
+    "description": "Classified military papers. KEEP FOR QUESTS!",
+    "weight": 0.2,
+    "stackSize": 20,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": true,
+    "questUses": ["Intelligence Gathering", "Black Site"],
+    "recommendation": "Keep",
+    "foundIn": ["Military Bases", "Bunkers"]
+  },
+  {
+    "name": "Research Notes",
+    "category": "Quest",
+    "rarity": "Rare",
+    "value": 200,
+    "description": "Scientific research documentation. KEEP FOR QUESTS!",
+    "weight": 0.2,
+    "stackSize": 20,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": true,
+    "questUses": ["ARC Research", "Lab Notes"],
+    "recommendation": "Keep",
+    "foundIn": ["Labs", "ARC Facilities"]
+  },
+  {
+    "name": "Key Card",
+    "category": "Quest",
     "rarity": "Uncommon",
     "value": 150,
-    "description": "High-quality cable for electronics and communications.",
+    "description": "Security access card. KEEP FOR QUESTS!",
+    "weight": 0.05,
+    "stackSize": 20,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": true,
+    "questUses": ["Secure Access", "Lab Access"],
+    "recommendation": "Keep",
+    "foundIn": ["Security Stations", "Offices", "Labs"]
+  },
+  {
+    "name": "ARC Fragment",
+    "category": "Component",
+    "rarity": "Epic",
+    "value": 1500,
+    "description": "Fragment of ARC technology. Extremely valuable for all workshops.",
+    "weight": 0.5,
+    "stackSize": 10,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["ARC Research", "Advanced Tech"],
+    "workshopUses": ["Gunsmith", "Gear Bench", "Medical Lab", "Scrappy"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["ARC Facilities", "Titan Boss", "High-Security Areas"]
+  },
+  {
+    "name": "Canned Food",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 35,
+    "description": "Preserved food. Safe to sell.",
+    "weight": 0.3,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["Residential", "Grocery Stores", "All Maps"]
+  },
+  {
+    "name": "Water Bottle",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 25,
+    "description": "Clean water supply. Safe to sell.",
+    "weight": 0.5,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["All Maps", "Vending Machines"]
+  },
+  {
+    "name": "Cigarettes",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 40,
+    "description": "Trade goods. Safe to sell.",
+    "weight": 0.1,
+    "stackSize": 100,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["Residential", "Gas Stations", "All Maps"]
+  },
+  {
+    "name": "Alcohol",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 65,
+    "description": "Bottled spirits. Safe to sell or keep for trades.",
+    "weight": 0.8,
+    "stackSize": 30,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": ["Medical Lab"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Either",
+    "foundIn": ["Bars", "Residential", "Grocery Stores"]
+  },
+  {
+    "name": "Plastic Container",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 30,
+    "description": "Empty plastic container. Low value, safe to sell or recycle.",
     "weight": 0.2,
     "stackSize": 50,
+    "recycleValuePercent": 60,
     "recycleOutputs": {
-      "Glass": 2,
-      "Silicon": 1
+      "Rubber Parts": 1
     },
-    "projectUses": [
-      "Comm Upgrades",
-      "Scanner Enhancement",
-      "Network Hub"
-    ],
-    "foundIn": [
-      "Communication Towers",
-      "Tech Buildings"
-    ]
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Either",
+    "foundIn": ["All Maps"]
+  },
+  {
+    "name": "Glass Bottle",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 20,
+    "description": "Empty glass bottle. Low value, safe to sell.",
+    "weight": 0.3,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["All Maps", "Bars", "Residential"]
+  },
+  {
+    "name": "Ammo Box",
+    "category": "Ammo",
+    "rarity": "Uncommon",
+    "value": 150,
+    "description": "Box of ammunition. Keep for combat.",
+    "weight": 1.0,
+    "stackSize": 20,
+    "recycleValuePercent": 68,
+    "recycleOutputs": {
+      "Metal Parts": 2
+    },
+    "projectUses": [],
+    "workshopUses": ["Gunsmith"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Military Sites", "Gun Shops", "Armories"]
+  },
+  {
+    "name": "Fuel Can",
+    "category": "Material",
+    "rarity": "Uncommon",
+    "value": 200,
+    "description": "Portable fuel container. Used for Scrappy workshop.",
+    "weight": 2.0,
+    "stackSize": 10,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["Vehicle Repairs"],
+    "workshopUses": ["Scrappy"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Gas Stations", "Garages", "Industrial"]
+  },
+  {
+    "name": "Circuit Board",
+    "category": "Component",
+    "rarity": "Uncommon",
+    "value": 250,
+    "description": "Salvaged electronics board. Good source of electrical components.",
+    "weight": 0.2,
+    "stackSize": 30,
+    "recycleValuePercent": 88,
+    "recycleOutputs": {
+      "Advanced Electrical Components": 2
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Tech Facilities", "Offices", "Electronics Stores"]
+  },
+  {
+    "name": "Computer Parts",
+    "category": "Material",
+    "rarity": "Uncommon",
+    "value": 180,
+    "description": "Salvaged computer hardware. Excellent electrical component source.",
+    "weight": 0.8,
+    "stackSize": 20,
+    "recycleValuePercent": 92,
+    "recycleOutputs": {
+      "Advanced Electrical Components": 3
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Offices", "Tech Facilities", "Schools"]
+  },
+  {
+    "name": "Solar Panel",
+    "category": "Component",
+    "rarity": "Rare",
+    "value": 420,
+    "description": "Damaged solar panel. High-value recycle or expedition project use.",
+    "weight": 2.5,
+    "stackSize": 5,
+    "recycleValuePercent": 78,
+    "recycleOutputs": {
+      "Advanced Electrical Components": 3,
+      "Metal Parts": 2
+    },
+    "projectUses": ["Power Grid", "Base Power"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Either",
+    "foundIn": ["Solar Farms", "Rooftops", "Industrial"]
+  },
+  {
+    "name": "Radio Equipment",
+    "category": "Component",
+    "rarity": "Uncommon",
+    "value": 220,
+    "description": "Communication radio parts. Good recycle value.",
+    "weight": 1.2,
+    "stackSize": 15,
+    "recycleValuePercent": 85,
+    "recycleOutputs": {
+      "Advanced Electrical Components": 2,
+      "Metal Parts": 1
+    },
+    "projectUses": ["Communications"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Communication Towers", "Military Sites"]
+  },
+  {
+    "name": "Rope",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 45,
+    "description": "Sturdy rope. Good fabric source.",
+    "weight": 0.5,
+    "stackSize": 40,
+    "recycleValuePercent": 75,
+    "recycleOutputs": {
+      "Fabric": 2
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Hardware Stores", "Industrial", "Docks"]
+  },
+  {
+    "name": "Tarp",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 55,
+    "description": "Heavy-duty tarpaulin. Good fabric/durable cloth source.",
+    "weight": 0.8,
+    "stackSize": 30,
+    "recycleValuePercent": 80,
+    "recycleOutputs": {
+      "Durable Cloth": 2,
+      "Fabric": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Construction Sites", "Warehouses"]
+  },
+  {
+    "name": "Hose",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 50,
+    "description": "Flexible rubber hose. Excellent Rubber Parts source.",
+    "weight": 0.6,
+    "stackSize": 40,
+    "recycleValuePercent": 88,
+    "recycleOutputs": {
+      "Rubber Parts": 3
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Garages", "Industrial", "Gas Stations"]
+  },
+  {
+    "name": "Belt",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 35,
+    "description": "Leather or fabric belt. Good for fabric/rubber.",
+    "weight": 0.2,
+    "stackSize": 50,
+    "recycleValuePercent": 72,
+    "recycleOutputs": {
+      "Fabric": 1,
+      "Rubber Parts": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Residential", "Clothing Stores"]
+  },
+  {
+    "name": "Shoes",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 40,
+    "description": "Various footwear. Good rubber source.",
+    "weight": 0.5,
+    "stackSize": 30,
+    "recycleValuePercent": 78,
+    "recycleOutputs": {
+      "Rubber Parts": 2,
+      "Fabric": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Recycle",
+    "foundIn": ["Residential", "Shoe Stores", "All Maps"]
+  },
+  {
+    "name": "Paint Can",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 60,
+    "description": "Can of paint. Moderate value, safe to sell.",
+    "weight": 1.5,
+    "stackSize": 20,
+    "recycleValuePercent": 40,
+    "recycleOutputs": {
+      "Metal Parts": 1
+    },
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["Hardware Stores", "Construction Sites"]
+  },
+  {
+    "name": "Cleaning Supplies",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 45,
+    "description": "Various cleaning products. Safe to sell.",
+    "weight": 0.6,
+    "stackSize": 40,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Sell",
+    "foundIn": ["Residential", "Janitor Closets", "All Maps"]
+  },
+  {
+    "name": "Helmet",
+    "category": "Armor",
+    "rarity": "Uncommon",
+    "value": 280,
+    "description": "Protective headgear. Keep or recycle for durable cloth.",
+    "weight": 0.8,
+    "stackSize": 10,
+    "recycleValuePercent": 65,
+    "recycleOutputs": {
+      "Durable Cloth": 2,
+      "Metal Parts": 1
+    },
+    "projectUses": [],
+    "workshopUses": ["Gear Bench"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Military Sites", "Construction Sites"]
+  },
+  {
+    "name": "Body Armor",
+    "category": "Armor",
+    "rarity": "Rare",
+    "value": 550,
+    "description": "Protective body armor. Keep for Gear Bench upgrades.",
+    "weight": 3.0,
+    "stackSize": 5,
+    "recycleValuePercent": 58,
+    "recycleOutputs": {
+      "Durable Cloth": 3,
+      "Metal Parts": 2
+    },
+    "projectUses": [],
+    "workshopUses": ["Gear Bench"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Military Sites", "Police Stations"]
+  },
+  {
+    "name": "Night Vision Goggles",
+    "category": "Component",
+    "rarity": "Epic",
+    "value": 1200,
+    "description": "Advanced optics equipment. Keep for workshop upgrades.",
+    "weight": 0.5,
+    "stackSize": 5,
+    "recycleValuePercent": 45,
+    "recycleOutputs": {
+      "Advanced Electrical Components": 2,
+      "Metal Parts": 1
+    },
+    "projectUses": [],
+    "workshopUses": ["Gunsmith", "Gear Bench"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Military Sites", "ARC Facilities"]
+  },
+  {
+    "name": "Medkit",
+    "category": "Consumable",
+    "rarity": "Uncommon",
+    "value": 180,
+    "description": "Advanced medical kit. Keep for Medical Lab or use.",
+    "weight": 0.6,
+    "stackSize": 10,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": [],
+    "workshopUses": ["Medical Lab"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Medical Facilities", "Ambulances"]
+  },
+  {
+    "name": "Surgical Kit",
+    "category": "Component",
+    "rarity": "Rare",
+    "value": 380,
+    "description": "Advanced surgical tools. Keep for Medical Lab!",
+    "weight": 0.8,
+    "stackSize": 10,
+    "recycleValuePercent": 52,
+    "recycleOutputs": {
+      "Metal Parts": 2
+    },
+    "projectUses": [],
+    "workshopUses": ["Medical Lab"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Hospitals", "Medical Labs"]
+  },
+  {
+    "name": "Fertilizer",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 80,
+    "description": "Agricultural fertilizer. Used in expedition projects.",
+    "weight": 2.0,
+    "stackSize": 20,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["Farm Project", "Garden"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Farms", "Garden Centers"]
+  },
+  {
+    "name": "Seeds",
+    "category": "Material",
+    "rarity": "Uncommon",
+    "value": 95,
+    "description": "Various plant seeds. Used in expedition projects.",
+    "weight": 0.2,
+    "stackSize": 50,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["Farm Project", "Garden"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Farms", "Garden Centers", "Greenhouses"]
+  },
+  {
+    "name": "Building Materials",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 70,
+    "description": "Construction materials. Used in expedition projects.",
+    "weight": 3.0,
+    "stackSize": 20,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["Base Expansion", "Fortifications"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Construction Sites", "Hardware Stores"]
+  },
+  {
+    "name": "Concrete Mix",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 55,
+    "description": "Bag of concrete mix. Used in expedition projects.",
+    "weight": 4.0,
+    "stackSize": 10,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["Fortifications", "Base Expansion"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Construction Sites", "Hardware Stores"]
+  },
+  {
+    "name": "Nails",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 25,
+    "description": "Box of nails. Used in expedition projects.",
+    "weight": 0.5,
+    "stackSize": 100,
+    "recycleValuePercent": 90,
+    "recycleOutputs": {
+      "Metal Parts": 2
+    },
+    "projectUses": ["Base Expansion"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Either",
+    "foundIn": ["Hardware Stores", "Construction Sites"]
+  },
+  {
+    "name": "Screws",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 30,
+    "description": "Assorted screws. Used in expedition projects.",
+    "weight": 0.4,
+    "stackSize": 100,
+    "recycleValuePercent": 88,
+    "recycleOutputs": {
+      "Metal Parts": 2
+    },
+    "projectUses": ["Base Expansion", "Fortifications"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Either",
+    "foundIn": ["Hardware Stores", "Construction Sites"]
+  },
+  {
+    "name": "Wood Planks",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 40,
+    "description": "Lumber for building. Used in expedition projects.",
+    "weight": 2.0,
+    "stackSize": 30,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["Base Expansion", "Fortifications"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Construction Sites", "Lumber Yards"]
+  },
+  {
+    "name": "Pipes",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 60,
+    "description": "Metal piping. Good Metal Parts source.",
+    "weight": 1.5,
+    "stackSize": 30,
+    "recycleValuePercent": 85,
+    "recycleOutputs": {
+      "Metal Parts": 3
+    },
+    "projectUses": ["Plumbing", "Water System"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Either",
+    "foundIn": ["Construction Sites", "Industrial", "Plumbing Stores"]
+  },
+  {
+    "name": "Water Pump",
+    "category": "Component",
+    "rarity": "Rare",
+    "value": 340,
+    "description": "Water pumping equipment. Used in expedition projects.",
+    "weight": 4.0,
+    "stackSize": 5,
+    "recycleValuePercent": 72,
+    "recycleOutputs": {
+      "Advanced Mechanical Components": 2,
+      "Metal Parts": 2,
+      "Rubber Parts": 1
+    },
+    "projectUses": ["Water System", "Farm Project"],
+    "workshopUses": [],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Farms", "Water Treatment", "Industrial"]
+  },
+  {
+    "name": "Titan Core Fragment",
+    "category": "Component",
+    "rarity": "Legendary",
+    "value": 2500,
+    "description": "A fragment from an ARC Titan's power core. Extremely valuable for all workshops.",
+    "weight": 2.0,
+    "stackSize": 5,
+    "recycleValuePercent": null,
+    "recycleOutputs": null,
+    "projectUses": ["Advanced Weapons", "Titan Armor", "Experimental Tech"],
+    "workshopUses": ["Gunsmith", "Gear Bench", "Medical Lab", "Scrappy"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["Titan Boss", "High-Security Areas"]
   },
   {
     "name": "Exotic Alloy",
     "category": "Material",
     "rarity": "Legendary",
     "value": 5000,
-    "description": "Extremely rare alien metal with unique properties.",
+    "description": "Extremely rare alien metal with unique properties. Never sell or recycle!",
     "weight": 1.5,
     "stackSize": 10,
-    "recycleOutputs": {
-      "Titanium": 5,
-      "Unknown Element": 1
-    },
-    "projectUses": [
-      "Legendary Weapons",
-      "Advanced Armor",
-      "Research Projects"
-    ],
-    "foundIn": [
-      "ARC Crash Sites",
-      "Titan Boss"
-    ]
-  },
-  {
-    "name": "Gunpowder",
-    "category": "Material",
-    "rarity": "Common",
-    "value": 80,
-    "description": "Basic propellant for ammunition crafting.",
-    "weight": 0.3,
-    "stackSize": 100,
-    "recycleOutputs": {
-      "Sulfur": 2,
-      "Carbon": 1,
-      "Potassium": 1
-    },
-    "projectUses": [
-      "Ammo Crafting",
-      "Explosives",
-      "Grenades"
-    ],
-    "foundIn": [
-      "Military Sites",
-      "Supply Crates"
-    ]
-  },
-  {
-    "name": "Kevlar Fiber",
-    "category": "Material",
-    "rarity": "Rare",
-    "value": 400,
-    "description": "High-strength fiber for advanced armor construction.",
-    "weight": 0.4,
-    "stackSize": 30,
-    "recycleOutputs": {
-      "Synthetic Fiber": 3,
-      "Carbon Fiber": 2
-    },
-    "projectUses": [
-      "Heavy Armor",
-      "Tactical Vest",
-      "Reinforced Container"
-    ],
-    "foundIn": [
-      "Military Bases",
-      "Supply Drops"
-    ]
-  },
-  {
-    "name": "Water Filter",
-    "category": "Component",
-    "rarity": "Common",
-    "value": 120,
-    "description": "Purification filter for clean water production.",
-    "weight": 0.6,
-    "stackSize": 20,
-    "recycleOutputs": {
-      "Charcoal": 2,
-      "Plastic": 1
-    },
-    "projectUses": [
-      "Water Purifier",
-      "Base Upgrade",
-      "Survival Kit"
-    ],
-    "foundIn": [
-      "Residential Areas",
-      "Water Treatment"
-    ]
-  },
-  {
-    "name": "Fuel Canister",
-    "category": "Consumable",
-    "rarity": "Uncommon",
-    "value": 200,
-    "description": "Portable fuel for vehicles and generators.",
-    "weight": 2.0,
-    "stackSize": 5,
+    "recycleValuePercent": null,
     "recycleOutputs": null,
-    "projectUses": [
-      "Vehicle Fuel",
-      "Generator Power"
-    ],
-    "foundIn": [
-      "Gas Stations",
-      "Industrial Sites"
-    ]
-  },
-  {
-    "name": "Biometric Scanner",
-    "category": "Component",
-    "rarity": "Rare",
-    "value": 800,
-    "description": "Advanced scanner for accessing secured areas.",
-    "weight": 0.5,
-    "stackSize": 5,
-    "recycleOutputs": {
-      "Circuit Board": 2,
-      "Lens": 1,
-      "Gold": 2
-    },
-    "projectUses": [
-      "Security Bypass",
-      "ID Scanner",
-      "Recon Drone"
-    ],
-    "foundIn": [
-      "Security Stations",
-      "ARC Facilities"
-    ]
-  },
-  {
-    "name": "Military-Grade Optic",
-    "category": "Component",
-    "rarity": "Epic",
-    "value": 1500,
-    "description": "High-quality optical component for weapon scopes.",
-    "weight": 0.3,
-    "stackSize": 5,
-    "recycleOutputs": {
-      "Glass": 3,
-      "Titanium": 2,
-      "Circuit Board": 1
-    },
-    "projectUses": [
-      "Sniper Scope",
-      "Night Vision",
-      "Thermal Sight"
-    ],
-    "foundIn": [
-      "Military Armory",
-      "Elite Supply Drops"
-    ]
+    "projectUses": ["Legendary Weapons", "Advanced Armor", "Research Projects"],
+    "workshopUses": ["Gunsmith", "Gear Bench"],
+    "keepForQuests": false,
+    "questUses": [],
+    "recommendation": "Keep",
+    "foundIn": ["ARC Crash Sites", "Titan Boss"]
   }
 ]

@@ -10,7 +10,8 @@ A lightweight, OCR-based external overlay tool for ARC Raiders, inspired by [Rat
 - **Event types** - Tracks Supply Drops, Storms, Convoys, and Extractions
 
 ### Item Scanner
-- **OCR-based scanning** - Press `Shift+S` to scan item tooltips
+- **Cursor-based scanning** - Hover over item, press hotkey to scan (works anywhere on screen)
+- **OCR-based recognition** - Reads item names from tooltips using Tesseract OCR
 - **Instant recommendations** - Color-coded banners tell you to KEEP, SELL, or RECYCLE
 - **Recycling efficiency** - Shows percentage value (green 70%+, yellow 50-69%, red <50%)
 - **Workshop tracking** - Shows which workshops need each item (Gunsmith, Gear Bench, Medical Lab, Scrappy)
@@ -107,13 +108,12 @@ The overlay needs to know where to look for text on your screen:
 4. Draw a rectangle around the events/timer area in-game
 5. Coordinates are saved relative to the game window
 
-#### Tooltip Region
-1. Hover over an item in-game to show its tooltip
-2. Click **"Calibrate Tooltip Region"**
-3. Draw a rectangle around where item tooltips appear
-4. Keep the selection tight around the text for best OCR results
+#### Item Scanner (No Calibration Needed)
+The item scanner uses **cursor-based detection** by default - it captures the area around your mouse cursor when you press the hotkey. This works anywhere on screen without calibration.
 
-**Tip:** For best OCR accuracy, calibrate regions that contain only text without icons or decorations.
+**Optional:** If you prefer fixed-region scanning, disable "Scan at cursor position" in Settings to use the legacy calibration mode.
+
+**Tip:** For best OCR accuracy, hover directly over the item name text when scanning.
 
 ### Settings Reference
 
@@ -134,8 +134,15 @@ The overlay needs to know where to look for text on your screen:
 
 | Hotkey | Action |
 |--------|--------|
-| `Ctrl + Shift + S` | Scan item tooltip (default, configurable in Settings) |
+| `Ctrl + Shift + S` | Scan item at cursor (default, configurable in Settings) |
 | `Escape` | Cancel calibration |
+
+**How to scan items:**
+1. Hover your mouse over an item tooltip in-game
+2. Press the scan hotkey (`Ctrl+Shift+S` by default)
+3. The overlay shows item info (value, recycle efficiency, recommendation)
+
+This works anywhere on screen - lobby, inventory, mid-match - no calibration needed.
 
 **Note:** The scan hotkey is configurable in Settings → General Settings → Item Scan Hotkey. The default `Ctrl+Shift+S` avoids conflict with in-game sprint (Shift).
 

@@ -135,8 +135,28 @@ public partial class SettingsWindow : Window
         // Hotkey settings
         LoadHotkeySettings(config);
 
+        // Item scanner settings
+        UseCursorScanning.IsChecked = config.UseCursorBasedScanning;
+        ScanRegionWidth.Text = config.ScanRegionWidth.ToString();
+        ScanRegionHeight.Text = config.ScanRegionHeight.ToString();
+        UpdateScanPanelVisibility();
+
         // OCR settings
         TessdataPath.Text = config.TessdataPath;
+    }
+
+    private void UseCursorScanning_Changed(object sender, RoutedEventArgs e)
+    {
+        UpdateScanPanelVisibility();
+    }
+
+    private void UpdateScanPanelVisibility()
+    {
+        if (CursorScanPanel == null || FixedRegionPanel == null) return;
+
+        var useCursor = UseCursorScanning.IsChecked ?? true;
+        CursorScanPanel.Visibility = useCursor ? Visibility.Visible : Visibility.Collapsed;
+        FixedRegionPanel.Visibility = useCursor ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void LoadHotkeySettings(AppConfig config)
@@ -252,6 +272,11 @@ public partial class SettingsWindow : Window
             // Parse regions using helper
             config.EventsRegion = ParseRegionFromTextBoxes(EventsRegionBoxes);
             config.TooltipRegion = ParseRegionFromTextBoxes(TooltipRegionBoxes);
+
+            // Item scanner settings
+            config.UseCursorBasedScanning = UseCursorScanning.IsChecked ?? true;
+            config.ScanRegionWidth = int.Parse(ScanRegionWidth.Text);
+            config.ScanRegionHeight = int.Parse(ScanRegionHeight.Text);
 
             // Game detection settings
             config.UseGameRelativeCoordinates = UseGameRelative.IsChecked ?? true;

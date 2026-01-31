@@ -138,6 +138,21 @@ public class AppConfig
     public int LastGameHeight { get; set; }
 
     /// <summary>
+    /// Width of the scan capture region (centered on cursor).
+    /// </summary>
+    public int ScanRegionWidth { get; set; } = 500;
+
+    /// <summary>
+    /// Height of the scan capture region (centered on cursor).
+    /// </summary>
+    public int ScanRegionHeight { get; set; } = 300;
+
+    /// <summary>
+    /// When true, scan captures at cursor position. When false, uses fixed TooltipRegion.
+    /// </summary>
+    public bool UseCursorBasedScanning { get; set; } = true;
+
+    /// <summary>
     /// Modifier key for the scan hotkey (e.g., Ctrl, Alt, Shift).
     /// Stored as string for JSON serialization.
     /// </summary>

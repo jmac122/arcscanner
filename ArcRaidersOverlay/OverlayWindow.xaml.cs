@@ -572,42 +572,58 @@ public partial class OverlayWindow : Window, IDisposable
             UpdateScanStatus("Scanning...");
 
             var config = _configManager.Config;
-            if (!config.TooltipRegion.IsValid)
-            {
-                UpdateScanStatus("Tooltip region not configured");
-                return;
-            }
+            System.Drawing.Bitmap bitmap;
 
-            // Capture tooltip region (convert to screen coords if using game-relative)
-            if (!TryGetScreenRegion(config.TooltipRegion, out var tooltipRegion))
+            if (config.UseCursorBasedScanning)
             {
-                UpdateScanStatus("Game not detected");
-                return;
-            }
-            using var bitmap = _screenCapture.CaptureRegion(tooltipRegion);
-            var text = _ocrManager.Recognize(bitmap);
-
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                UpdateScanStatus("No text detected");
-                HideTooltip();
-                return;
-            }
-
-            // Extract item name (first line typically)
-            var itemName = text.Split('\n')[0].Trim();
-            var item = _dataManager.GetItem(itemName);
-
-            if (item != null)
-            {
-                ShowItemTooltip(item);
-                UpdateScanStatus($"Found: {item.Name}");
-                UpdateLastScannedItem(item.Name);
+                // Capture region centered on current cursor position
+                bitmap = _screenCapture.CaptureAtCursor(
+                    config.ScanRegionWidth,
+                    config.ScanRegionHeight);
             }
             else
             {
-                UpdateScanStatus($"Unknown item: {itemName}");
-                HideTooltip();
+                // Legacy: Use fixed tooltip region (requires calibration)
+                if (!config.TooltipRegion.IsValid)
+                {
+                    UpdateScanStatus("Tooltip region not configured");
+                    return;
+                }
+
+                if (!TryGetScreenRegion(config.TooltipRegion, out var tooltipRegion))
+                {
+                    UpdateScanStatus("Game not detected");
+                    return;
+                }
+                bitmap = _screenCapture.CaptureRegion(tooltipRegion);
+            }
+
+            using (bitmap)
+            {
+                var text = _ocrManager.Recognize(bitmap);
+
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    UpdateScanStatus("No text detected");
+                    HideTooltip();
+                    return;
+                }
+
+                // Extract item name (first line typically)
+                var itemName = text.Split('\n')[0].Trim();
+                var item = _dataManager.GetItem(itemName);
+
+                if (item != null)
+                {
+                    ShowItemTooltip(item);
+                    UpdateScanStatus($"Found: {item.Name}");
+                    UpdateLastScannedItem(item.Name);
+                }
+                else
+                {
+                    UpdateScanStatus($"Unknown item: {itemName}");
+                    HideTooltip();
+                }
             }
         }
         catch (Exception ex)

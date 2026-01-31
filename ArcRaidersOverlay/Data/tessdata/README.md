@@ -20,7 +20,7 @@ Download `eng.traineddata` from one of these sources:
 
 ## Notes
 
-- File size for `tessdata_best` is approximately 4.2MB
-- File size for `tessdata_fast` is approximately 4.1MB
-- The `best` version provides higher accuracy but is slightly slower
-- The `fast` version is optimized for speed with good accuracy
+- File size for `tessdata_best` is approximately **15 MB**
+- File size for `tessdata_fast` is approximately **4 MB**
+- The `best` version provides higher accuracy but is slightly slower (recommended for game text)
+- The `fast` version is optimized for speed with lower accuracy

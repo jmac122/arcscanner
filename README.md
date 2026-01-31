@@ -42,7 +42,7 @@ A lightweight, OCR-based external overlay tool for ARC Raiders, inspired by [Rat
 1. Download the latest release from the [Releases](../../releases) page
 2. Extract the ZIP to a folder (e.g., `C:\Tools\ArcRaidersOverlay`)
 3. Download Tesseract language data:
-   - Get `eng.traineddata` from [tessdata](https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata)
+   - Get `eng.traineddata` from [tessdata_best](https://github.com/tesseract-ocr/tessdata_best/raw/main/eng.traineddata) (~15 MB)
    - Place it in the `Data/tessdata/` folder
 4. Run `ArcRaidersOverlay.exe`
 

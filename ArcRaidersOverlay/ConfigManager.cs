@@ -269,6 +269,17 @@ public class AppConfig
     public bool UseCursorBasedScanning { get; set; } = true;
 
     /// <summary>
+    /// Horizontal offset from cursor for tooltip capture (positive = right).
+    /// Arc Raiders tooltips appear far to the right of the cursor.
+    /// </summary>
+    public int ScanOffsetX { get; set; } = 150;
+
+    /// <summary>
+    /// Vertical offset from cursor for tooltip capture (positive = down).
+    /// </summary>
+    public int ScanOffsetY { get; set; } = -100;
+
+    /// <summary>
     /// Modifier key for the scan hotkey (e.g., Ctrl, Alt, Shift).
     /// Stored as string for JSON serialization.
     /// </summary>

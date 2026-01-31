@@ -562,7 +562,13 @@ public partial class OverlayWindow : Window, IDisposable
             // Only build full event list if not in compact mode
             if (!isCompactMode)
             {
-                foreach (var evt in events)
+                // Deduplicate: show only the next occurrence of each event type
+                var uniqueEvents = events
+                    .GroupBy(e => e.Name)
+                    .Select(g => g.First())
+                    .ToList();
+
+                foreach (var evt in uniqueEvents)
                 {
                     var panel = new StackPanel { Orientation = Orientation.Horizontal };
 
@@ -792,11 +798,13 @@ public partial class OverlayWindow : Window, IDisposable
 
             if (config.UseCursorBasedScanning)
             {
-                LogMessage($"Capturing {config.ScanRegionWidth}x{config.ScanRegionHeight} tooltip region to the right of cursor");
+                LogMessage($"Capturing {config.ScanRegionWidth}x{config.ScanRegionHeight} at offset ({config.ScanOffsetX}, {config.ScanOffsetY}) from cursor");
                 // Capture tooltip region - tooltip appears to the RIGHT of the cursor in Arc Raiders
                 bitmap = _screenCapture.CaptureTooltipAtCursor(
                     config.ScanRegionWidth,
-                    config.ScanRegionHeight);
+                    config.ScanRegionHeight,
+                    config.ScanOffsetX,
+                    config.ScanOffsetY);
             }
             else
             {

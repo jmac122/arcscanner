@@ -41,8 +41,7 @@ public partial class OverlayWindow : Window, IDisposable
     private bool _isClickThrough;
     private bool _disposed;
     private static readonly string LogFilePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "ArcRaidersOverlay", "overlay.log");
+        AppDomain.CurrentDomain.BaseDirectory, "overlay.log");
 
     public OverlayWindow()
     {
@@ -72,9 +71,6 @@ public partial class OverlayWindow : Window, IDisposable
         // Clear old log on startup
         try
         {
-            var logDir = Path.GetDirectoryName(LogFilePath);
-            if (!string.IsNullOrEmpty(logDir))
-                Directory.CreateDirectory(logDir);
             File.WriteAllText(LogFilePath, $"=== ArcRaidersOverlay Log Started {DateTime.Now} ===\n");
         }
         catch { /* Ignore logging errors */ }

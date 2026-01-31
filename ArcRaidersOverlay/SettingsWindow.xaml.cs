@@ -110,15 +110,17 @@ public partial class SettingsWindow : Window
 
     #endregion
 
-    private RegionTextBoxes EventsRegionBoxes => new(EventsX, EventsY, EventsWidth, EventsHeight);
     private RegionTextBoxes TooltipRegionBoxes => new(TooltipX, TooltipY, TooltipWidth, TooltipHeight);
 
     private void LoadSettings()
     {
         var config = _configManager.Config;
 
-        // Load regions using helper
-        LoadRegionToTextBoxes(config.EventsRegion, EventsRegionBoxes);
+        // Events settings
+        ShowEvents.IsChecked = config.ShowEvents;
+        EventsCompactMode.IsChecked = config.EventsCompactMode;
+
+        // Load tooltip region
         LoadRegionToTextBoxes(config.TooltipRegion, TooltipRegionBoxes);
 
         // Game detection settings
@@ -215,12 +217,6 @@ public partial class SettingsWindow : Window
         return string.Join(",", parts);
     }
 
-    private void CalibrateEvents_Click(object sender, RoutedEventArgs e)
-    {
-        var useGameRelative = UseGameRelative.IsChecked ?? true;
-        CalibrateRegion("Events Region", EventsRegionBoxes, useGameRelative);
-    }
-
     private void CalibrateTooltip_Click(object sender, RoutedEventArgs e)
     {
         var useGameRelative = UseGameRelative.IsChecked ?? true;
@@ -269,8 +265,11 @@ public partial class SettingsWindow : Window
         {
             var config = _configManager.Config;
 
-            // Parse regions using helper
-            config.EventsRegion = ParseRegionFromTextBoxes(EventsRegionBoxes);
+            // Events settings
+            config.ShowEvents = ShowEvents.IsChecked ?? true;
+            config.EventsCompactMode = EventsCompactMode.IsChecked ?? false;
+
+            // Parse tooltip region
             config.TooltipRegion = ParseRegionFromTextBoxes(TooltipRegionBoxes);
 
             // Item scanner settings

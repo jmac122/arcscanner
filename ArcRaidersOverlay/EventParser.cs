@@ -208,25 +208,4 @@ public static class EventParser
         return text;
     }
 
-    /// <summary>
-    /// Parses a timer string to TimeSpan.
-    /// </summary>
-    public static TimeSpan? ParseTimer(string timer)
-    {
-        if (string.IsNullOrWhiteSpace(timer))
-            return null;
-
-        if (timer.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase))
-            return TimeSpan.Zero;
-
-        var parts = timer.Split(':');
-        if (parts.Length == 2 &&
-            int.TryParse(parts[0], out var minutes) &&
-            int.TryParse(parts[1], out var seconds))
-        {
-            return new TimeSpan(0, minutes, seconds);
-        }
-
-        return null;
-    }
 }

@@ -10,7 +10,6 @@
 
     <Grid>
         <tb:TaskbarIcon x:Name="TrayIcon"
-                        IconSource="pack://application:,,,/app.ico"
                         ToolTipText="ARC Raiders Overlay"
                         DoubleClickCommand="{Binding ToggleOverlayCommand}">
             <tb:TaskbarIcon.ContextMenu>

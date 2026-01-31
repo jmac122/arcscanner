@@ -29,7 +29,7 @@ public partial class CalibrationWindow : Window
     /// <summary>
     /// The selected region in absolute screen coordinates.
     /// </summary>
-    public RegionConfig SelectedScreenRegion { get; private set; } = new();
+    private RegionConfig SelectedScreenRegion { get; set; } = new();
 
     public CalibrationWindow(string regionName, bool useGameRelative = true)
     {

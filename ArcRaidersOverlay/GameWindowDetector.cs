@@ -281,19 +281,6 @@ public class GameWindowDetector : IDisposable
     }
 
     /// <summary>
-    /// Converts game-relative coordinates to screen coordinates.
-    /// </summary>
-    public System.Drawing.Point GameRelativeToScreen(System.Drawing.Point relativePoint)
-    {
-        if (CurrentWindow == null)
-            return relativePoint;
-
-        return new System.Drawing.Point(
-            relativePoint.X + CurrentWindow.Bounds.X,
-            relativePoint.Y + CurrentWindow.Bounds.Y);
-    }
-
-    /// <summary>
     /// Converts a region from game-relative to screen coordinates.
     /// </summary>
     public RegionConfig GameRelativeToScreen(RegionConfig relativeRegion)

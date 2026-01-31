@@ -726,9 +726,9 @@ public partial class OverlayWindow : Window, IDisposable
 
             if (config.UseCursorBasedScanning)
             {
-                Log($"Capturing {config.ScanRegionWidth}x{config.ScanRegionHeight} region centered on cursor");
-                // Capture region centered on current cursor position
-                bitmap = _screenCapture.CaptureAtCursor(
+                Log($"Capturing {config.ScanRegionWidth}x{config.ScanRegionHeight} tooltip region to the right of cursor");
+                // Capture tooltip region - tooltip appears to the RIGHT of the cursor in Arc Raiders
+                bitmap = _screenCapture.CaptureTooltipAtCursor(
                     config.ScanRegionWidth,
                     config.ScanRegionHeight);
             }

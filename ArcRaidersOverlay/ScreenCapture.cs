@@ -105,4 +105,29 @@ public class ScreenCapture
         var cursor = GetCursorPosition();
         return CaptureAtPosition(cursor.X, cursor.Y, width, height);
     }
+
+    /// <summary>
+    /// Captures a region to the right of the current cursor position.
+    /// This is useful for tooltips that appear to the right of the hovered item.
+    /// </summary>
+    /// <param name="width">Width of capture region</param>
+    /// <param name="height">Height of capture region</param>
+    /// <param name="offsetX">Horizontal offset from cursor (positive = right)</param>
+    /// <param name="offsetY">Vertical offset from cursor (positive = down)</param>
+    /// <returns>A bitmap of the captured region.</returns>
+    public Bitmap CaptureTooltipAtCursor(int width, int height, int offsetX = 20, int offsetY = -50)
+    {
+        var cursor = GetCursorPosition();
+        var screenBounds = System.Windows.Forms.Screen.FromPoint(cursor).Bounds;
+
+        // Start capture at cursor + offset, tooltip is to the right
+        int x = cursor.X + offsetX;
+        int y = cursor.Y + offsetY;
+
+        // Clamp to screen bounds
+        x = Math.Max(screenBounds.X, Math.Min(x, screenBounds.Right - width));
+        y = Math.Max(screenBounds.Y, Math.Min(y, screenBounds.Bottom - height));
+
+        return CaptureRegion(new Rectangle(x, y, width, height));
+    }
 }

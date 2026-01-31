@@ -313,10 +313,10 @@ public class AppConfig
 
             case "1440p":
                 ScanRegionWidth = 500;
-                ScanRegionHeight = 450;
-                ScanOffsetX = 130;
-                ScanOffsetY = -270;
-                IconSize = 62;  // ~62px icons at 1440p
+                ScanRegionHeight = 550;
+                ScanOffsetX = 10;      // Tooltip is right next to the icon
+                ScanOffsetY = -500;    // Start much higher to capture item name
+                IconSize = 62;
                 break;
 
             case "4K":

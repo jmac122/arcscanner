@@ -79,16 +79,19 @@ public class ScreenCapture
     /// <returns>A bitmap of the captured region.</returns>
     public Bitmap CaptureAtPosition(int centerX, int centerY, int width, int height)
     {
+        var screenBounds = System.Windows.Forms.Screen.FromPoint(new System.Drawing.Point(centerX, centerY)).Bounds;
+        var captureWidth = Math.Min(width, screenBounds.Width);
+        var captureHeight = Math.Min(height, screenBounds.Height);
+
         // Calculate top-left corner from center point
-        int x = centerX - width / 2;
-        int y = centerY - height / 2;
+        int x = centerX - captureWidth / 2;
+        int y = centerY - captureHeight / 2;
 
         // Ensure we don't go off-screen (clamp to screen bounds)
-        var screenBounds = System.Windows.Forms.Screen.FromPoint(new System.Drawing.Point(centerX, centerY)).Bounds;
-        x = Math.Max(screenBounds.X, Math.Min(x, screenBounds.Right - width));
-        y = Math.Max(screenBounds.Y, Math.Min(y, screenBounds.Bottom - height));
+        x = Math.Max(screenBounds.X, Math.Min(x, screenBounds.Right - captureWidth));
+        y = Math.Max(screenBounds.Y, Math.Min(y, screenBounds.Bottom - captureHeight));
 
-        return CaptureRegion(new Rectangle(x, y, width, height));
+        return CaptureRegion(new Rectangle(x, y, captureWidth, captureHeight));
     }
 
     /// <summary>

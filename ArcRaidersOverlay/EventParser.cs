@@ -9,19 +9,6 @@ public static class EventParser
     // Maps loaded from configuration file (supports user customization)
     private static readonly List<MapInfo> KnownMaps;
 
-    // Fallback maps if config file is missing
-    private static readonly List<MapInfo> DefaultMaps = new()
-    {
-        new() { Name = "Dread Canyon", FileName = "dread_canyon.png", Aliases = new() { "dread", "canyon" } },
-        new() { Name = "Blackstone Quarry", FileName = "blackstone_quarry.png", Aliases = new() { "blackstone", "quarry" } },
-        new() { Name = "Wraith Basin", FileName = "wraith_basin.png", Aliases = new() { "wraith", "basin" } },
-        new() { Name = "Thornback Ridge", FileName = "thornback_ridge.png", Aliases = new() { "thornback", "ridge" } },
-        new() { Name = "Dustfall Expanse", FileName = "dustfall_expanse.png", Aliases = new() { "dustfall", "expanse" } },
-        new() { Name = "Sunken Reach", FileName = "sunken_reach.png", Aliases = new() { "sunken", "reach" } },
-        new() { Name = "Ironwood Forest", FileName = "ironwood_forest.png", Aliases = new() { "ironwood", "forest" } },
-        new() { Name = "Ashland Dunes", FileName = "ashland_dunes.png", Aliases = new() { "ashland", "dunes" } }
-    };
-
     static EventParser()
     {
         KnownMaps = LoadMapsFromConfig();
@@ -29,23 +16,21 @@ public static class EventParser
 
     private static List<MapInfo> LoadMapsFromConfig()
     {
+        var json = ReadMapsJson();
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            System.Diagnostics.Debug.WriteLine("Maps config not found, map detection disabled");
+            return new List<MapInfo>();
+        }
+
         try
         {
-            var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "maps", "maps.json");
-
-            if (!File.Exists(configPath))
-            {
-                System.Diagnostics.Debug.WriteLine($"Maps config not found at {configPath}, using defaults");
-                return DefaultMaps;
-            }
-
-            var json = File.ReadAllText(configPath);
             var config = JsonConvert.DeserializeObject<MapsConfig>(json);
 
             if (config?.Maps == null || config.Maps.Count == 0)
             {
-                System.Diagnostics.Debug.WriteLine("Maps config empty, using defaults");
-                return DefaultMaps;
+                System.Diagnostics.Debug.WriteLine("Maps config empty, map detection disabled");
+                return new List<MapInfo>();
             }
 
             System.Diagnostics.Debug.WriteLine($"Loaded {config.Maps.Count} maps from config");
@@ -54,8 +39,41 @@ public static class EventParser
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error loading maps config: {ex.Message}");
-            return DefaultMaps;
+            return new List<MapInfo>();
         }
+    }
+
+    private static string? ReadMapsJson()
+    {
+        var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "maps", "maps.json");
+        if (File.Exists(configPath))
+        {
+            return File.ReadAllText(configPath);
+        }
+
+        System.Diagnostics.Debug.WriteLine($"Maps config not found at {configPath}, checking embedded resource");
+        return ReadMapsJsonFromResource();
+    }
+
+    private static string? ReadMapsJsonFromResource()
+    {
+        var assembly = typeof(EventParser).Assembly;
+        var resourceName = assembly.GetManifestResourceNames()
+            .FirstOrDefault(name => name.EndsWith("Data.maps.maps.json", StringComparison.OrdinalIgnoreCase));
+
+        if (string.IsNullOrWhiteSpace(resourceName))
+        {
+            return null;
+        }
+
+        using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream == null)
+        {
+            return null;
+        }
+
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
     }
 
     // Regex patterns for parsing event text

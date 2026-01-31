@@ -22,11 +22,6 @@ public partial class CalibrationWindow : Window
     /// </summary>
     public RegionConfig SelectedRegion { get; private set; } = new();
 
-    /// <summary>
-    /// The selected region in absolute screen coordinates.
-    /// </summary>
-    private RegionConfig SelectedScreenRegion { get; set; } = new();
-
     public CalibrationWindow(string regionName, bool useGameRelative = true)
     {
         InitializeComponent();
@@ -225,7 +220,7 @@ public partial class CalibrationWindow : Window
         var screenY = windowY + _screenTop;
 
         // Store screen region
-        SelectedScreenRegion = new RegionConfig
+        var selectedScreenRegion = new RegionConfig
         {
             X = screenX,
             Y = screenY,
@@ -251,7 +246,7 @@ public partial class CalibrationWindow : Window
         else
         {
             // Use absolute screen coordinates
-            SelectedRegion = SelectedScreenRegion;
+            SelectedRegion = selectedScreenRegion;
         }
 
         DialogResult = true;

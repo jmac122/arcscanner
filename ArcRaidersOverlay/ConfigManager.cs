@@ -287,6 +287,12 @@ public class AppConfig
     public string GameResolution { get; set; } = "1080p";
 
     /// <summary>
+    /// Size of inventory icons at the current resolution (pixels).
+    /// Used for template matching.
+    /// </summary>
+    public int IconSize { get; set; } = 48;
+
+    /// <summary>
     /// Applies resolution preset values. Call this when resolution changes.
     /// The Y offset is negative to start ABOVE the cursor since Arc Raiders
     /// tooltips appear above and to the right of the hovered item.
@@ -301,14 +307,16 @@ public class AppConfig
                 ScanRegionWidth = 400;
                 ScanRegionHeight = 350;
                 ScanOffsetX = 100;
-                ScanOffsetY = -200;  // Start 200px above cursor to capture title
+                ScanOffsetY = -200;
+                IconSize = 48;  // ~48px icons at 1080p
                 break;
 
             case "1440p":
                 ScanRegionWidth = 500;
                 ScanRegionHeight = 450;
                 ScanOffsetX = 130;
-                ScanOffsetY = -270;  // Start 270px above cursor to capture title
+                ScanOffsetY = -270;
+                IconSize = 62;  // ~62px icons at 1440p
                 break;
 
             case "4K":
@@ -316,7 +324,8 @@ public class AppConfig
                 ScanRegionWidth = 700;
                 ScanRegionHeight = 650;
                 ScanOffsetX = 200;
-                ScanOffsetY = -400;  // Start 400px above cursor to capture title
+                ScanOffsetY = -400;
+                IconSize = 96;  // ~96px icons at 4K
                 break;
 
             case "Custom":

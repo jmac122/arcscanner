@@ -790,110 +790,129 @@ public partial class OverlayWindow : Window, IDisposable
             UpdateScanStatus("Scanning...");
 
             var config = _configManager.Config;
-            System.Drawing.Bitmap bitmap;
-
-            // Get cursor position for logging
             var cursorPos = System.Windows.Forms.Cursor.Position;
             LogMessage($"Scan triggered - Cursor at ({cursorPos.X}, {cursorPos.Y})");
 
-            if (config.UseCursorBasedScanning)
+            Models.Item? foundItem = null;
+            string matchSource = "";
+            double matchConfidence = 0;
+
+            // Phase 1: Try icon matching first (capture icon area centered on cursor)
+            if (_iconManager?.IsReady == true && config.UseCursorBasedScanning)
             {
-                LogMessage($"Capturing {config.ScanRegionWidth}x{config.ScanRegionHeight} at offset ({config.ScanOffsetX}, {config.ScanOffsetY}) from cursor");
-                // Capture tooltip region - tooltip appears to the RIGHT of the cursor in Arc Raiders
-                bitmap = _screenCapture.CaptureTooltipAtCursor(
-                    config.ScanRegionWidth,
-                    config.ScanRegionHeight,
-                    config.ScanOffsetX,
-                    config.ScanOffsetY);
-            }
-            else
-            {
-                // Legacy: Use fixed tooltip region (requires calibration)
-                if (!config.TooltipRegion.IsValid)
+                var iconSize = config.IconSize;
+                // Capture icon region centered on cursor with some padding
+                var iconCapture = _screenCapture.CaptureTooltipAtCursor(
+                    iconSize + 20,  // Add padding for edge cases
+                    iconSize + 20,
+                    -(iconSize / 2) - 10,  // Center on cursor
+                    -(iconSize / 2) - 10);
+
+                using (iconCapture)
                 {
-                    UpdateScanStatus("Tooltip region not configured");
-                    return;
-                }
+                    LogMessage($"Icon capture: {iconCapture.Width}x{iconCapture.Height} centered on cursor");
 
-                if (!TryGetScreenRegion(config.TooltipRegion, out var tooltipRegion))
-                {
-                    UpdateScanStatus("Game not detected");
-                    return;
-                }
-                bitmap = _screenCapture.CaptureRegion(tooltipRegion);
-            }
-
-            using (bitmap)
-            {
-                LogMessage($"Captured bitmap: {bitmap.Width}x{bitmap.Height}");
-
-                // Save debug image
-                try
-                {
-                    var debugDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug");
-                    Directory.CreateDirectory(debugDir);
-                    var debugPath = Path.Combine(debugDir, $"scan_{DateTime.Now:HHmmss}.png");
-                    bitmap.Save(debugPath, System.Drawing.Imaging.ImageFormat.Png);
-                    LogMessage($"Debug image saved: {debugPath}");
-                }
-                catch (Exception saveEx)
-                {
-                    LogMessage($"Failed to save debug image: {saveEx.Message}");
-                }
-
-                // Try OCR-based matching first
-                var text = _ocrManager.Recognize(bitmap);
-                LogMessage($"OCR result: '{text?.Replace("\n", "\\n") ?? "(null)"}'");
-
-                Models.Item? foundItem = null;
-                string matchSource = "";
-                double matchConfidence = 0;
-
-                // Phase 1: Smart OCR matching - try all lines, filter stats
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    var (ocrItem, matchedLine, ocrConfidence) = _dataManager.GetBestItemMatch(text);
-                    if (ocrItem != null)
+                    // Save icon debug image
+                    try
                     {
-                        foundItem = ocrItem;
-                        matchSource = $"OCR: '{matchedLine}'";
-                        matchConfidence = ocrConfidence;
-                        LogMessage($"OCR match: '{matchedLine}' → '{ocrItem.Name}' ({ocrConfidence:P0})");
+                        var debugDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug");
+                        Directory.CreateDirectory(debugDir);
+                        var iconDebugPath = Path.Combine(debugDir, $"scan_icon_{DateTime.Now:HHmmss}.png");
+                        iconCapture.Save(iconDebugPath, System.Drawing.Imaging.ImageFormat.Png);
+                        LogMessage($"Icon debug image saved: {iconDebugPath}");
                     }
-                }
+                    catch { }
 
-                // Phase 2: Icon matching (if available and OCR didn't find high-confidence match)
-                if (_iconManager?.IsReady == true && (foundItem == null || matchConfidence < 0.9))
-                {
-                    var (iconItemName, iconConfidence) = _iconManager.MatchIcon(bitmap);
-                    if (iconItemName != null && iconConfidence > matchConfidence)
+                    var (iconItemName, iconConf) = _iconManager.MatchIcon(iconCapture, config.IconSize);
+                    if (iconItemName != null && iconConf >= 0.7)
                     {
                         var iconItem = _dataManager.GetItem(iconItemName);
                         if (iconItem != null)
                         {
                             foundItem = iconItem;
-                            matchSource = $"Icon ({iconConfidence:P0})";
-                            matchConfidence = iconConfidence;
-                            LogMessage($"Icon match: '{iconItemName}' ({iconConfidence:P0}) - better than OCR");
+                            matchSource = $"Icon ({iconConf:P0})";
+                            matchConfidence = iconConf;
+                            LogMessage($"Icon match: '{iconItemName}' ({iconConf:P0})");
                         }
                     }
+                    else
+                    {
+                        LogMessage($"Icon match failed or low confidence: {iconConf:P0}");
+                    }
                 }
+            }
 
-                // Display result
-                if (foundItem != null)
+            // Phase 2: OCR fallback (capture tooltip area if icon match failed or low confidence)
+            if (foundItem == null || matchConfidence < 0.85)
+            {
+                System.Drawing.Bitmap? tooltipBitmap = null;
+
+                if (config.UseCursorBasedScanning)
                 {
-                    ShowItemTooltip(foundItem);
-                    UpdateScanStatus($"Found: {foundItem.Name}");
-                    UpdateLastScannedItem(foundItem.Name);
-                    LogMessage($"Final match via {matchSource}: {foundItem.Name}");
+                    LogMessage($"Capturing tooltip {config.ScanRegionWidth}x{config.ScanRegionHeight} at offset ({config.ScanOffsetX}, {config.ScanOffsetY})");
+                    tooltipBitmap = _screenCapture.CaptureTooltipAtCursor(
+                        config.ScanRegionWidth,
+                        config.ScanRegionHeight,
+                        config.ScanOffsetX,
+                        config.ScanOffsetY);
                 }
                 else
                 {
-                    var firstLine = text?.Split('\n').FirstOrDefault()?.Trim() ?? "nothing";
-                    UpdateScanStatus($"Unknown: {firstLine}");
-                    HideTooltip();
-                    LogMessage($"No match found. OCR first line was: '{firstLine}'");
+                    // Legacy: Use fixed tooltip region
+                    if (config.TooltipRegion.IsValid && TryGetScreenRegion(config.TooltipRegion, out var tooltipRegion))
+                    {
+                        tooltipBitmap = _screenCapture.CaptureRegion(tooltipRegion);
+                    }
                 }
+
+                if (tooltipBitmap != null)
+                {
+                    using (tooltipBitmap)
+                    {
+                        LogMessage($"Tooltip capture: {tooltipBitmap.Width}x{tooltipBitmap.Height}");
+
+                        // Save tooltip debug image
+                        try
+                        {
+                            var debugDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug");
+                            Directory.CreateDirectory(debugDir);
+                            var debugPath = Path.Combine(debugDir, $"scan_tooltip_{DateTime.Now:HHmmss}.png");
+                            tooltipBitmap.Save(debugPath, System.Drawing.Imaging.ImageFormat.Png);
+                            LogMessage($"Tooltip debug image saved: {debugPath}");
+                        }
+                        catch { }
+
+                        var text = _ocrManager.Recognize(tooltipBitmap);
+                        LogMessage($"OCR result: '{text?.Replace("\n", "\\n") ?? "(null)"}'");
+
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            var (ocrItem, matchedLine, ocrConfidence) = _dataManager.GetBestItemMatch(text);
+                            if (ocrItem != null && ocrConfidence > matchConfidence)
+                            {
+                                foundItem = ocrItem;
+                                matchSource = $"OCR: '{matchedLine}'";
+                                matchConfidence = ocrConfidence;
+                                LogMessage($"OCR match: '{matchedLine}' → '{ocrItem.Name}' ({ocrConfidence:P0})");
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Display result
+            if (foundItem != null)
+            {
+                ShowItemTooltip(foundItem);
+                UpdateScanStatus($"Found: {foundItem.Name}");
+                UpdateLastScannedItem(foundItem.Name);
+                LogMessage($"Final match via {matchSource}: {foundItem.Name}");
+            }
+            else
+            {
+                UpdateScanStatus("Unknown item");
+                HideTooltip();
+                LogMessage("No match found");
             }
         }
         catch (Exception ex)

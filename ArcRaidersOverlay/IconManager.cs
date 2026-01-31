@@ -10,6 +10,12 @@ namespace ArcRaidersOverlay;
 /// </summary>
 public class IconManager : IDisposable
 {
+    /// <summary>
+    /// Size to resize icon templates to for matching.
+    /// Larger = more accurate but slower. 96px is a good balance.
+    /// </summary>
+    private const int IconTemplateSize = 96;
+
     private readonly Dictionary<string, Mat> _icons;
     private readonly Dictionary<string, string> _iconToItemName;
     private bool _disposed;
@@ -83,9 +89,10 @@ public class IconManager : IDisposable
                     continue;
                 }
 
-                // Resize icons to a standard size for faster matching (64x64)
+                // Resize icons to standard template size for consistent matching
                 var resized = new Mat();
-                Cv2.Resize(mat, resized, new OpenCvSharp.Size(64, 64), interpolation: InterpolationFlags.Area);
+                Cv2.Resize(mat, resized, new OpenCvSharp.Size(IconTemplateSize, IconTemplateSize),
+                    interpolation: InterpolationFlags.Area);
                 mat.Dispose();
 
                 _icons[fileName] = resized;
@@ -112,8 +119,9 @@ public class IconManager : IDisposable
     /// Matches a captured bitmap against loaded icons using template matching.
     /// </summary>
     /// <param name="captured">The captured screen region (should contain an item icon)</param>
+    /// <param name="targetSize">The expected icon size at current resolution (default 64)</param>
     /// <returns>The matched item name and confidence score (0-1)</returns>
-    public (string? itemName, float confidence) MatchIcon(System.Drawing.Bitmap captured)
+    public (string? itemName, float confidence) MatchIcon(System.Drawing.Bitmap captured, int targetSize = 64)
     {
         if (_icons.Count == 0)
         {
@@ -129,9 +137,10 @@ public class IconManager : IDisposable
                 return (null, 0);
             }
 
-            // Resize source to match icon size (64x64)
+            // Resize source to match the template size we loaded icons at
             using var resizedSource = new Mat();
-            Cv2.Resize(sourceMat, resizedSource, new OpenCvSharp.Size(64, 64), interpolation: InterpolationFlags.Area);
+            Cv2.Resize(sourceMat, resizedSource, new OpenCvSharp.Size(IconTemplateSize, IconTemplateSize),
+                interpolation: InterpolationFlags.Area);
 
             string? bestMatch = null;
             float bestConfidence = 0;

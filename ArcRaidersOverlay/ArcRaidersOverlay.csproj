@@ -17,6 +17,7 @@
     <Version>1.0.0</Version>
     <Authors>ArcScanner</Authors>
     <Description>Lightweight overlay tool for ARC Raiders</Description>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>

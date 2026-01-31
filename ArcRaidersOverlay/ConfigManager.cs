@@ -281,6 +281,7 @@ public class AppConfig
     /// </summary>
     public void ApplyResolutionPreset(string resolution)
     {
+        var previousResolution = GameResolution;
         GameResolution = resolution;
 
         switch (resolution)
@@ -312,6 +313,9 @@ public class AppConfig
 
             case "Custom":
                 // Don't modify values - user has customized them
+                break;
+            default:
+                GameResolution = previousResolution;
                 break;
         }
     }

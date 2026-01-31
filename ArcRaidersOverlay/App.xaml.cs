@@ -98,16 +98,19 @@ public partial class App : Application
                             // Access denied - likely elevated
                             return true;
                         }
-                        catch
+                        catch (Exception ex)
                         {
-                            // Ignore other errors and continue to next process
+                            // Log other errors for debugging, but continue
+                            Debug.WriteLine(
+                                $"Error checking process '{process.ProcessName}': {ex.Message}");
                         }
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore errors
+                // Log errors for debugging
+                Debug.WriteLine($"Error getting processes by name '{name}': {ex.Message}");
             }
         }
 

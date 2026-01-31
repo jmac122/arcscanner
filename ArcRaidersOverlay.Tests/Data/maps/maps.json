@@ -1,0 +1,14 @@
+{
+  "maps": [
+    {
+      "name": "Dread Canyon",
+      "fileName": "dread_canyon.png",
+      "aliases": ["dread", "canyon"]
+    },
+    {
+      "name": "Blackstone Quarry",
+      "fileName": "blackstone_quarry.png",
+      "aliases": ["blackstone", "quarry"]
+    }
+  ]
+}

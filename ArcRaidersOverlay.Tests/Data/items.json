@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Scrap Metal",
+    "category": "Material",
+    "rarity": "Common",
+    "value": 120,
+    "description": "Basic crafting material.",
+    "weight": 1.2,
+    "stackSize": 10
+  },
+  {
+    "name": "Arc Core",
+    "category": "Component",
+    "rarity": "Rare",
+    "value": 3000,
+    "description": "High-tech component.",
+    "weight": 2.4,
+    "stackSize": 1
+  }
+]

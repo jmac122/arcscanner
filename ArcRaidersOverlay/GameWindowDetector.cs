@@ -194,9 +194,11 @@ public class GameWindowDetector : IDisposable
                 if (foundHwnd != IntPtr.Zero)
                     break;
             }
-            catch
+            catch (Exception ex)
             {
                 // Process access denied or other error
+                Debug.WriteLine(
+                    $"Error getting processes by name '{processName}': {ex.Message}");
             }
         }
 

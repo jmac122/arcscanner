@@ -245,6 +245,7 @@ public partial class OverlayWindow : Window, IDisposable
 
                     config.LastGameWidth = e.WindowInfo.Bounds.Width;
                     config.LastGameHeight = e.WindowInfo.Bounds.Height;
+                    _configManager.Save();
                 }
 
                 if (_configManager?.Config.FollowGameWindow == true)

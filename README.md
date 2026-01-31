@@ -126,6 +126,7 @@ The overlay needs to know where to look for text on your screen:
 | **Start with Windows** | Launch overlay automatically on boot | Off |
 | **Start minimized** | Start minimized to system tray | Off |
 | **Event Poll Interval** | How often to scan for events (seconds) | 15 |
+| **Item Scan Hotkey** | Modifier keys + key to trigger item scan | Ctrl+Shift+S |
 | **Tessdata Path** | Location of Tesseract language files | ./Data/tessdata |
 
 ## Usage
@@ -134,8 +135,10 @@ The overlay needs to know where to look for text on your screen:
 
 | Hotkey | Action |
 |--------|--------|
-| `Shift + S` | Scan item tooltip |
+| `Ctrl + Shift + S` | Scan item tooltip (default, configurable in Settings) |
 | `Escape` | Cancel calibration |
+
+**Note:** The scan hotkey is configurable in Settings → General Settings → Item Scan Hotkey. The default `Ctrl+Shift+S` avoids conflict with in-game sprint (Shift).
 
 ### Overlay Controls
 
@@ -209,7 +212,9 @@ Settings are stored in `%AppData%/ArcRaidersOverlay/config.json`
   "OverlayOffsetX": 10,
   "OverlayOffsetY": 10,
   "StartWithWindows": false,
-  "StartMinimized": false
+  "StartMinimized": false,
+  "ScanHotkeyModifier": "Control,Shift",
+  "ScanHotkeyKey": "S"
 }
 ```
 

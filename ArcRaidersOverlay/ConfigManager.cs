@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using Newtonsoft.Json;
 
 namespace ArcRaidersOverlay;
@@ -135,6 +136,53 @@ public class AppConfig
     /// </summary>
     public int LastGameWidth { get; set; }
     public int LastGameHeight { get; set; }
+
+    /// <summary>
+    /// Modifier key for the scan hotkey (e.g., Ctrl, Alt, Shift).
+    /// Stored as string for JSON serialization.
+    /// </summary>
+    public string ScanHotkeyModifier { get; set; } = "Control,Shift";
+
+    /// <summary>
+    /// Key for the scan hotkey (e.g., S, F9).
+    /// Stored as string for JSON serialization.
+    /// </summary>
+    public string ScanHotkeyKey { get; set; } = "S";
+
+    /// <summary>
+    /// Gets the scan hotkey modifier as ModifierKeys enum.
+    /// </summary>
+    [JsonIgnore]
+    public ModifierKeys ScanModifierKeys
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(ScanHotkeyModifier))
+                return ModifierKeys.Control | ModifierKeys.Shift;
+
+            ModifierKeys result = ModifierKeys.None;
+            foreach (var part in ScanHotkeyModifier.Split(','))
+            {
+                if (Enum.TryParse<ModifierKeys>(part.Trim(), out var mod))
+                    result |= mod;
+            }
+            return result == ModifierKeys.None ? ModifierKeys.Control | ModifierKeys.Shift : result;
+        }
+    }
+
+    /// <summary>
+    /// Gets the scan hotkey key as Key enum.
+    /// </summary>
+    [JsonIgnore]
+    public Key ScanKey
+    {
+        get
+        {
+            if (Enum.TryParse<Key>(ScanHotkeyKey, out var key))
+                return key;
+            return Key.S;
+        }
+    }
 }
 
 public class RegionConfig

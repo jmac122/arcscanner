@@ -9,11 +9,51 @@ public partial class SettingsWindow : Window
 {
     private readonly ConfigManager _configManager;
 
+    // Common keys for hotkey selection
+    private static readonly Key[] AvailableKeys =
+    {
+        Key.A, Key.B, Key.C, Key.D, Key.E, Key.F, Key.G, Key.H, Key.I, Key.J, Key.K, Key.L, Key.M,
+        Key.N, Key.O, Key.P, Key.Q, Key.R, Key.S, Key.T, Key.U, Key.V, Key.W, Key.X, Key.Y, Key.Z,
+        Key.D0, Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8, Key.D9,
+        Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6, Key.F7, Key.F8, Key.F9, Key.F10, Key.F11, Key.F12,
+        Key.OemTilde, Key.OemMinus, Key.OemPlus, Key.OemOpenBrackets, Key.OemCloseBrackets,
+        Key.OemSemicolon, Key.OemQuotes, Key.OemComma, Key.OemPeriod, Key.OemQuestion
+    };
+
     public SettingsWindow(ConfigManager configManager)
     {
         InitializeComponent();
         _configManager = configManager;
+        InitializeHotkeyComboBox();
         LoadSettings();
+    }
+
+    private void InitializeHotkeyComboBox()
+    {
+        foreach (var key in AvailableKeys)
+        {
+            var displayName = GetKeyDisplayName(key);
+            HotkeyKey.Items.Add(new ComboBoxItem { Content = displayName, Tag = key });
+        }
+    }
+
+    private static string GetKeyDisplayName(Key key)
+    {
+        return key switch
+        {
+            >= Key.D0 and <= Key.D9 => key.ToString()[1..], // "D0" -> "0"
+            Key.OemTilde => "~",
+            Key.OemMinus => "-",
+            Key.OemPlus => "=",
+            Key.OemOpenBrackets => "[",
+            Key.OemCloseBrackets => "]",
+            Key.OemSemicolon => ";",
+            Key.OemQuotes => "'",
+            Key.OemComma => ",",
+            Key.OemPeriod => ".",
+            Key.OemQuestion => "/",
+            _ => key.ToString()
+        };
     }
 
     #region Region Calibration Helpers
@@ -92,8 +132,67 @@ public partial class SettingsWindow : Window
         StartMinimized.IsChecked = config.StartMinimized;
         PollInterval.Text = config.EventPollIntervalSeconds.ToString();
 
+        // Hotkey settings
+        LoadHotkeySettings(config);
+
         // OCR settings
         TessdataPath.Text = config.TessdataPath;
+    }
+
+    private void LoadHotkeySettings(AppConfig config)
+    {
+        var modifiers = config.ScanModifierKeys;
+        HotkeyCtrl.IsChecked = modifiers.HasFlag(ModifierKeys.Control);
+        HotkeyShift.IsChecked = modifiers.HasFlag(ModifierKeys.Shift);
+        HotkeyAlt.IsChecked = modifiers.HasFlag(ModifierKeys.Alt);
+
+        var key = config.ScanKey;
+        for (int i = 0; i < HotkeyKey.Items.Count; i++)
+        {
+            if (HotkeyKey.Items[i] is ComboBoxItem item && item.Tag is Key itemKey && itemKey == key)
+            {
+                HotkeyKey.SelectedIndex = i;
+                break;
+            }
+        }
+
+        // Default to S if not found
+        if (HotkeyKey.SelectedIndex < 0)
+        {
+            for (int i = 0; i < HotkeyKey.Items.Count; i++)
+            {
+                if (HotkeyKey.Items[i] is ComboBoxItem item && item.Tag is Key itemKey && itemKey == Key.S)
+                {
+                    HotkeyKey.SelectedIndex = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    private (ModifierKeys modifiers, Key key) GetSelectedHotkey()
+    {
+        ModifierKeys modifiers = ModifierKeys.None;
+        if (HotkeyCtrl.IsChecked == true) modifiers |= ModifierKeys.Control;
+        if (HotkeyShift.IsChecked == true) modifiers |= ModifierKeys.Shift;
+        if (HotkeyAlt.IsChecked == true) modifiers |= ModifierKeys.Alt;
+
+        Key key = Key.S;
+        if (HotkeyKey.SelectedItem is ComboBoxItem item && item.Tag is Key selectedKey)
+        {
+            key = selectedKey;
+        }
+
+        return (modifiers, key);
+    }
+
+    private static string ModifiersToString(ModifierKeys modifiers)
+    {
+        var parts = new List<string>();
+        if (modifiers.HasFlag(ModifierKeys.Control)) parts.Add("Control");
+        if (modifiers.HasFlag(ModifierKeys.Shift)) parts.Add("Shift");
+        if (modifiers.HasFlag(ModifierKeys.Alt)) parts.Add("Alt");
+        return string.Join(",", parts);
     }
 
     private void CalibrateEvents_Click(object sender, RoutedEventArgs e)
@@ -165,6 +264,17 @@ public partial class SettingsWindow : Window
             config.StartWithWindows = startWithWindows;
             config.StartMinimized = StartMinimized.IsChecked ?? false;
             config.EventPollIntervalSeconds = int.Parse(PollInterval.Text);
+
+            // Hotkey settings
+            var (modifiers, key) = GetSelectedHotkey();
+            if (modifiers == ModifierKeys.None)
+            {
+                MessageBox.Show("Please select at least one modifier key (Ctrl, Shift, or Alt) for the hotkey.",
+                    "Invalid Hotkey", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            config.ScanHotkeyModifier = ModifiersToString(modifiers);
+            config.ScanHotkeyKey = key.ToString();
 
             // OCR settings
             config.TessdataPath = TessdataPath.Text;

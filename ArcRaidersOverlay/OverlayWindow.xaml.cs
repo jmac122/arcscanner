@@ -96,8 +96,7 @@ public partial class OverlayWindow : Window, IDisposable
             var hwnd = new WindowInteropHelper(this).Handle;
             _hotkeyManager = new HotkeyManager(hwnd);
             _hotkeyManager.HotkeyPressed += OnHotkeyPressed;
-            _hotkeyManager.RegisterHotkey(HotkeyManager.SCAN_HOTKEY_ID,
-                ModifierKeys.Shift, Key.S);
+            RegisterConfiguredHotkey();
 
             // Hook into window messages for hotkeys
             var source = HwndSource.FromHwnd(hwnd);
@@ -124,13 +123,56 @@ public partial class OverlayWindow : Window, IDisposable
             OnEventPollTick(this, EventArgs.Empty);
 
             UpdateGameStatus();
-            UpdateScanStatus("Press [Shift+S] to scan item");
+            UpdateScanStatusWithHotkey();
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Initialization error: {ex.Message}", "Error",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    private void RegisterConfiguredHotkey()
+    {
+        if (_hotkeyManager == null || _configManager == null) return;
+
+        // Unregister existing hotkey first
+        _hotkeyManager.UnregisterHotkey(HotkeyManager.SCAN_HOTKEY_ID);
+
+        // Register with configured values
+        var modifiers = _configManager.Config.ScanModifierKeys;
+        var key = _configManager.Config.ScanKey;
+        _hotkeyManager.RegisterHotkey(HotkeyManager.SCAN_HOTKEY_ID, modifiers, key);
+    }
+
+    private string GetHotkeyDisplayString()
+    {
+        if (_configManager == null) return "Ctrl+Shift+S";
+
+        var parts = new List<string>();
+        var modifiers = _configManager.Config.ScanModifierKeys;
+
+        if (modifiers.HasFlag(ModifierKeys.Control)) parts.Add("Ctrl");
+        if (modifiers.HasFlag(ModifierKeys.Shift)) parts.Add("Shift");
+        if (modifiers.HasFlag(ModifierKeys.Alt)) parts.Add("Alt");
+
+        var key = _configManager.Config.ScanKey;
+        var keyStr = key switch
+        {
+            >= Key.D0 and <= Key.D9 => key.ToString()[1..],
+            Key.OemTilde => "~",
+            Key.OemMinus => "-",
+            Key.OemPlus => "=",
+            _ => key.ToString()
+        };
+        parts.Add(keyStr);
+
+        return string.Join("+", parts);
+    }
+
+    private void UpdateScanStatusWithHotkey()
+    {
+        UpdateScanStatus($"Press [{GetHotkeyDisplayString()}] to scan item");
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -782,6 +824,8 @@ public partial class OverlayWindow : Window, IDisposable
 
         // Refresh with new settings
         ApplyEventPollInterval();
+        RegisterConfiguredHotkey();
+        UpdateScanStatusWithHotkey();
         OnEventPollTick(this, EventArgs.Empty);
     }
 

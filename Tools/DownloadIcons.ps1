@@ -15,7 +15,7 @@ if (-not (Test-Path $OutputDir)) {
 Write-Host "Downloading item icons from arcraiders.wiki..." -ForegroundColor Cyan
 Write-Host "Output directory: $OutputDir" -ForegroundColor Gray
 
-$apiUrl = "https://arcraiders.wiki/api.php"
+$apiUrl = "https://arcraiders.wiki/w/api.php"
 $allFiles = @()
 $continueToken = $null
 

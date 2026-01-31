@@ -84,7 +84,7 @@
                         <Ellipse Width="8" Height="8" Fill="#00D46E" Margin="0,0,8,0" VerticalAlignment="Center"/>
                         <TextBlock Text="ACTIVE NOW"
                                    FontSize="11" FontWeight="SemiBold"
-                                   Foreground="#888A8C" LetterSpacing="0.5"/>
+                                   Foreground="#888A8C"/>
                         <TextBlock x:Name="EventsCompactSummary"
                                    Style="{StaticResource EventTextStyle}" Foreground="#666666"
                                    Visibility="Collapsed" VerticalAlignment="Center" Margin="10,0,0,0"/>

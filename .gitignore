@@ -72,3 +72,4 @@ ArcRaidersOverlay/Data/maps/*.jpg
 ArcRaidersOverlay/app.ico
 .vscode/launch.json
 .vscode/tasks.json
+**/*.zip

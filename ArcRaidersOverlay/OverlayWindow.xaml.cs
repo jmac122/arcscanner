@@ -35,6 +35,7 @@ public partial class OverlayWindow : Window, IDisposable
     private HotkeyManager? _hotkeyManager;
     private ConfigManager? _configManager;
     private GameWindowDetector? _gameWindowDetector;
+    private EventApiClient? _eventApiClient;
     private bool _isLocked;
     private bool _isClickThrough;
     private bool _disposed;
@@ -106,6 +107,9 @@ public partial class OverlayWindow : Window, IDisposable
             _gameWindowDetector = new GameWindowDetector();
             _gameWindowDetector.GameWindowChanged += OnGameWindowChanged;
             _gameWindowDetector.StartMonitoring();
+
+            // Initialize event API client (replaces OCR-based event detection)
+            _eventApiClient = new EventApiClient();
 
             // Apply saved position or follow game
             if (_configManager.Config.FollowGameWindow && _gameWindowDetector.IsGameRunning)
@@ -348,9 +352,9 @@ public partial class OverlayWindow : Window, IDisposable
 
     #region Event Polling
 
-    private void OnEventPollTick(object? sender, EventArgs e)
+    private async void OnEventPollTick(object? sender, EventArgs e)
     {
-        if (_ocrManager == null || _screenCapture == null || _configManager == null)
+        if (_eventApiClient == null)
         {
             UpdateEventsPanel(new List<GameEvent>());
             return;
@@ -358,32 +362,19 @@ public partial class OverlayWindow : Window, IDisposable
 
         try
         {
-            var config = _configManager.Config;
-            if (!config.EventsRegion.IsValid)
-            {
-                // No region configured - show placeholder
-                UpdateEventsPanel(new List<GameEvent>());
-                return;
-            }
-
-            // Capture events region (convert to screen coords if using game-relative)
-            if (!TryGetScreenRegion(config.EventsRegion, out var eventsRegion))
-            {
-                UpdateEventsPanel(new List<GameEvent>());
-                return;
-            }
-            using var bitmap = _screenCapture.CaptureRegion(eventsRegion);
-            var text = _ocrManager.Recognize(bitmap);
-
-            // Parse events
-            var events = EventParser.Parse(text);
+            // Fetch events from API
+            var events = await _eventApiClient.GetEventsAsync();
             UpdateEventsPanel(events);
 
-            // Detect current map
-            var mapInfo = EventParser.DetectMapInfo(text);
-            if (mapInfo != null)
+            // Load minimap for first active event's map
+            var activeEvent = events.FirstOrDefault(ev => ev.Timer.StartsWith("ACTIVE"));
+            if (activeEvent != null)
             {
-                LoadMinimap(mapInfo);
+                var mapInfo = EventParser.DetectMapInfo(activeEvent.Location);
+                if (mapInfo != null)
+                {
+                    LoadMinimap(mapInfo);
+                }
             }
         }
         catch (Exception ex)
@@ -869,6 +860,7 @@ public partial class OverlayWindow : Window, IDisposable
         _gameWindowDetector?.Dispose();
         _hotkeyManager?.Dispose();
         _ocrManager?.Dispose();
+        _eventApiClient?.Dispose();
 
         GC.SuppressFinalize(this);
     }

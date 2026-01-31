@@ -1,44 +1,29 @@
 {
   "maps": [
     {
-      "name": "Dread Canyon",
-      "fileName": "dread_canyon.png",
-      "aliases": ["dread", "canyon"]
+      "name": "Blue Gate",
+      "fileName": "blue_gate.png",
+      "aliases": ["blue", "gate", "bluegate"]
     },
     {
-      "name": "Blackstone Quarry",
-      "fileName": "blackstone_quarry.png",
-      "aliases": ["blackstone", "quarry"]
+      "name": "Dam",
+      "fileName": "dam.png",
+      "aliases": ["dam-battlegrounds", "battlegrounds"]
     },
     {
-      "name": "Wraith Basin",
-      "fileName": "wraith_basin.png",
-      "aliases": ["wraith", "basin"]
+      "name": "Stella Montis",
+      "fileName": "stella_montis.png",
+      "aliases": ["stella", "montis"]
     },
     {
-      "name": "Thornback Ridge",
-      "fileName": "thornback_ridge.png",
-      "aliases": ["thornback", "ridge"]
+      "name": "Spaceport",
+      "fileName": "spaceport.png",
+      "aliases": ["space", "port"]
     },
     {
-      "name": "Dustfall Expanse",
-      "fileName": "dustfall_expanse.png",
-      "aliases": ["dustfall", "expanse"]
-    },
-    {
-      "name": "Sunken Reach",
-      "fileName": "sunken_reach.png",
-      "aliases": ["sunken", "reach"]
-    },
-    {
-      "name": "Ironwood Forest",
-      "fileName": "ironwood_forest.png",
-      "aliases": ["ironwood", "forest"]
-    },
-    {
-      "name": "Ashland Dunes",
-      "fileName": "ashland_dunes.png",
-      "aliases": ["ashland", "dunes"]
+      "name": "Buried City",
+      "fileName": "buried_city.png",
+      "aliases": ["buried", "city"]
     }
   ]
 }

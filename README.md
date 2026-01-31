@@ -18,7 +18,7 @@ A lightweight, OCR-based external overlay tool for ARC Raiders, inspired by [Rat
 - **68+ item database** - Comprehensive item data with sell values, recycle outputs, and uses
 
 ### Multi-Monitor Support
-- **Game window detection** - Automatically finds ARC Raiders (`PioneerGame.exe`) on any monitor
+- **Game window detection** - Automatically finds ARC Raiders on any monitor (detects `PioneerGame`, `ArcRaiders`, and variant process names)
 - **Game-relative coordinates** - Calibration works regardless of where game window is positioned
 - **Overlay follows game** - Optional auto-positioning when game window moves
 - **DPI awareness** - Per-monitor DPI scaling support
@@ -50,14 +50,15 @@ A lightweight, OCR-based external overlay tool for ARC Raiders, inspired by [Rat
 ```
 ArcRaidersOverlay/
 ├── ArcRaidersOverlay.exe    ← Run this
-├── Data/
-│   ├── items.json           ← Item database (included)
-│   ├── tessdata/
-│   │   └── eng.traineddata  ← Download this
-│   └── maps/
-│       └── maps.json        ← Map data (included)
-└── config.json              ← Created on first run
+└── Data/
+    ├── items.json           ← Item database (included)
+    ├── tessdata/
+    │   └── eng.traineddata  ← Download this
+    └── maps/
+        └── maps.json        ← Map data (included)
 ```
+
+**Note:** Settings are saved to `%AppData%/ArcRaidersOverlay/config.json` (created on first run)
 
 ### Option 2: Build from Source
 
@@ -86,7 +87,7 @@ dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
 The published EXE is self-contained (~60-80 MB) and includes the .NET runtime, so users don't need to install .NET separately.
 
-**Important:** After building, copy the `Data` folder to the publish directory alongside the EXE
+The `Data` folder is automatically copied to the output directory during build.
 
 ## Setup Guide
 
@@ -347,8 +348,10 @@ ArcRaidersOverlay/
 ├── HotkeyManager.cs           # Global hotkey registration
 ├── ConfigManager.cs           # Settings persistence
 ├── GameWindowDetector.cs      # Game window detection
+├── GameProcessNames.cs        # Known game executable names
 ├── Theme.cs                   # UI color constants
-├── app.manifest               # UAC and DPI settings
+├── GlobalUsings.cs            # Shared using directives
+├── app.manifest               # UAC settings
 └── Data/
     ├── items.json             # Item database (68+ items)
     └── maps/

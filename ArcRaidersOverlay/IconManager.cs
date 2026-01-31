@@ -85,7 +85,7 @@ public class IconManager : IDisposable
 
                 // Resize icons to a standard size for faster matching (64x64)
                 var resized = new Mat();
-                Cv2.Resize(mat, resized, new Size(64, 64), interpolation: InterpolationFlags.Area);
+                Cv2.Resize(mat, resized, new OpenCvSharp.Size(64, 64), interpolation: InterpolationFlags.Area);
                 mat.Dispose();
 
                 _icons[fileName] = resized;
@@ -131,7 +131,7 @@ public class IconManager : IDisposable
 
             // Resize source to match icon size (64x64)
             using var resizedSource = new Mat();
-            Cv2.Resize(sourceMat, resizedSource, new Size(64, 64), interpolation: InterpolationFlags.Area);
+            Cv2.Resize(sourceMat, resizedSource, new OpenCvSharp.Size(64, 64), interpolation: InterpolationFlags.Area);
 
             string? bestMatch = null;
             float bestConfidence = 0;

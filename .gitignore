@@ -73,3 +73,5 @@ ArcRaidersOverlay/app.ico
 .vscode/launch.json
 .vscode/tasks.json
 **/*.zip
+*.cursorindexingignore/**
+*.specstory/**

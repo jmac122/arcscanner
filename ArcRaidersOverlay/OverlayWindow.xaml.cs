@@ -558,14 +558,63 @@ public partial class OverlayWindow : Window, IDisposable
     {
         Dispatcher.Invoke(() =>
         {
+            // Recommendation banner
+            SetRecommendationBanner(item.Recommendation, item.KeepForQuests);
+
             TooltipItemName.Text = item.Name;
             TooltipItemCategory.Text = $"{item.Category} - {item.Rarity}";
-            TooltipValue.Text = $"{item.Value:N0} Credits";
+            TooltipValue.Text = $"{item.Value:N0} Φ";
+
+            // Quest item warning
+            if (item.KeepForQuests)
+            {
+                TooltipQuestWarning.Visibility = Visibility.Visible;
+                var questText = item.QuestUses?.Count > 0
+                    ? $"QUEST ITEM: {string.Join(", ", item.QuestUses)}"
+                    : "KEEP FOR QUESTS!";
+                TooltipQuestText.Text = questText;
+            }
+            else
+            {
+                TooltipQuestWarning.Visibility = Visibility.Collapsed;
+            }
+
+            // Recycle efficiency percentage
+            if (item.RecycleValuePercent.HasValue)
+            {
+                TooltipRecyclePercentRow.Visibility = Visibility.Visible;
+                var percent = item.RecycleValuePercent.Value;
+                TooltipRecyclePercent.Text = $"{percent}%";
+                TooltipRecyclePercent.Foreground = percent >= 70
+                    ? Theme.BrushRecycleGood
+                    : percent >= 50 ? Theme.BrushRecycleMedium : Theme.BrushRecyclePoor;
+            }
+            else
+            {
+                TooltipRecyclePercentRow.Visibility = Visibility.Collapsed;
+            }
+
+            // Workshop uses
+            TooltipWorkshopUses.Children.Clear();
+            if (item.WorkshopUses != null && item.WorkshopUses.Count > 0)
+            {
+                TooltipWorkshopSection.Visibility = Visibility.Visible;
+                foreach (var workshop in item.WorkshopUses)
+                {
+                    TooltipWorkshopUses.Children.Add(CreateTooltipTextBlock(
+                        $"  {workshop}", Theme.BrushWorkshop));
+                }
+            }
+            else
+            {
+                TooltipWorkshopSection.Visibility = Visibility.Collapsed;
+            }
 
             // Recycle outputs
             TooltipRecycleOutputs.Children.Clear();
             if (item.RecycleOutputs != null && item.RecycleOutputs.Count > 0)
             {
+                TooltipRecycleSection.Visibility = Visibility.Visible;
                 foreach (var output in item.RecycleOutputs)
                 {
                     TooltipRecycleOutputs.Children.Add(CreateTooltipTextBlock(
@@ -574,14 +623,14 @@ public partial class OverlayWindow : Window, IDisposable
             }
             else
             {
-                TooltipRecycleOutputs.Children.Add(CreateTooltipTextBlock(
-                    "  Not recyclable", Theme.BrushTextDisabled));
+                TooltipRecycleSection.Visibility = Visibility.Collapsed;
             }
 
             // Project uses
             TooltipProjectUses.Children.Clear();
             if (item.ProjectUses != null && item.ProjectUses.Count > 0)
             {
+                TooltipProjectSection.Visibility = Visibility.Visible;
                 foreach (var project in item.ProjectUses)
                 {
                     TooltipProjectUses.Children.Add(CreateTooltipTextBlock(
@@ -590,8 +639,7 @@ public partial class OverlayWindow : Window, IDisposable
             }
             else
             {
-                TooltipProjectUses.Children.Add(CreateTooltipTextBlock(
-                    "  Not used in projects", Theme.BrushTextDisabled));
+                TooltipProjectSection.Visibility = Visibility.Collapsed;
             }
 
             TooltipPanel.Visibility = Visibility.Visible;
@@ -600,6 +648,32 @@ public partial class OverlayWindow : Window, IDisposable
             _tooltipHideTimer.Stop();
             _tooltipHideTimer.Start();
         });
+    }
+
+    private void SetRecommendationBanner(string? recommendation, bool keepForQuests)
+    {
+        if (keepForQuests)
+        {
+            TooltipRecommendation.Text = "KEEP FOR QUESTS";
+            TooltipRecommendationBorder.Background = Theme.BrushRecommendQuest;
+            TooltipRecommendation.Foreground = Theme.BrushTextDefault;
+            return;
+        }
+
+        var (text, background, foreground) = recommendation?.ToUpperInvariant() switch
+        {
+            "KEEP" => ("KEEP", Theme.BrushRecommendKeep, Theme.BrushTextDefault),
+            "SELL" => ("SELL", Theme.BrushRecommendSell, Theme.BrushTextDefault),
+            "RECYCLE" => ("RECYCLE", Theme.BrushRecommendRecycle, Theme.BrushTextDefault),
+            "EITHER" => ("SELL OR RECYCLE", Theme.BrushRecommendEither, Theme.BrushTextDefault),
+            _ => ("", Theme.BrushTransparent, Theme.BrushTextMuted)
+        };
+
+        TooltipRecommendation.Text = text;
+        TooltipRecommendationBorder.Background = background;
+        TooltipRecommendation.Foreground = foreground;
+        TooltipRecommendationBorder.Visibility = string.IsNullOrEmpty(text)
+            ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void HideTooltip()

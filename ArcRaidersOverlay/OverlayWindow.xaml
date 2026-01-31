@@ -112,6 +112,14 @@
         <Border Grid.Row="5" x:Name="TooltipPanel" Background="#DD1a1a1a" CornerRadius="5"
                 Padding="10" Visibility="Collapsed" BorderBrush="#555555" BorderThickness="1">
             <StackPanel>
+                <!-- Recommendation Banner -->
+                <Border x:Name="TooltipRecommendationBorder" CornerRadius="3" Padding="8,4"
+                        Margin="0,0,0,8" Background="#2288FF88">
+                    <TextBlock x:Name="TooltipRecommendation"
+                               Style="{StaticResource TooltipTextStyle}"
+                               FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                </Border>
+
                 <!-- Item Name -->
                 <TextBlock x:Name="TooltipItemName" Style="{StaticResource HeaderTextStyle}"
                            FontSize="14" Foreground="#FFCC00" Margin="0,0,0,5"/>
@@ -120,39 +128,73 @@
                 <TextBlock x:Name="TooltipItemCategory" Style="{StaticResource TooltipTextStyle}"
                            Foreground="#AAAAAA" FontSize="10" Margin="0,0,0,8"/>
 
-                <!-- Value Section -->
-                <Border Background="#33444444" CornerRadius="3" Padding="5" Margin="0,0,0,5">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Value:" Style="{StaticResource TooltipTextStyle}"/>
-                        <TextBlock x:Name="TooltipValue" Grid.Column="1"
-                                   Style="{StaticResource TooltipTextStyle}"
-                                   Foreground="#88FF88" FontWeight="SemiBold"/>
-                    </Grid>
+                <!-- Quest Item Warning -->
+                <Border x:Name="TooltipQuestWarning" CornerRadius="3" Padding="5"
+                        Margin="0,0,0,5" Background="#44FF8800" Visibility="Collapsed">
+                    <TextBlock x:Name="TooltipQuestText" Style="{StaticResource TooltipTextStyle}"
+                               Foreground="#FFAA00" FontWeight="SemiBold"/>
                 </Border>
+
+                <!-- Value and Recycle % Section -->
+                <Border Background="#33444444" CornerRadius="3" Padding="5" Margin="0,0,0,5">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Sell Value:" Style="{StaticResource TooltipTextStyle}"/>
+                            <TextBlock x:Name="TooltipValue" Grid.Column="1"
+                                       Style="{StaticResource TooltipTextStyle}"
+                                       Foreground="#88FF88" FontWeight="SemiBold"/>
+                        </Grid>
+                        <Grid x:Name="TooltipRecyclePercentRow" Margin="0,3,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Recycle Efficiency:" Style="{StaticResource TooltipTextStyle}"/>
+                            <TextBlock x:Name="TooltipRecyclePercent" Grid.Column="1"
+                                       Style="{StaticResource TooltipTextStyle}" FontWeight="SemiBold"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Workshop Uses -->
+                <StackPanel x:Name="TooltipWorkshopSection" Margin="0,0,0,5">
+                    <TextBlock Text="Workshop Uses:" Style="{StaticResource TooltipTextStyle}"
+                               Foreground="#AAAAAA" Margin="0,0,0,3"/>
+                    <Border Background="#33444444" CornerRadius="3" Padding="5">
+                        <StackPanel x:Name="TooltipWorkshopUses">
+                            <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
+                                       Foreground="#666666"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
                 <!-- Recycle Outputs -->
-                <TextBlock Text="Recycle Outputs:" Style="{StaticResource TooltipTextStyle}"
-                           Foreground="#AAAAAA" Margin="0,5,0,3"/>
-                <Border Background="#33444444" CornerRadius="3" Padding="5" Margin="0,0,0,5">
-                    <StackPanel x:Name="TooltipRecycleOutputs">
-                        <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
-                                   Foreground="#666666"/>
-                    </StackPanel>
-                </Border>
+                <StackPanel x:Name="TooltipRecycleSection" Margin="0,0,0,5">
+                    <TextBlock Text="Recycle Outputs:" Style="{StaticResource TooltipTextStyle}"
+                               Foreground="#AAAAAA" Margin="0,0,0,3"/>
+                    <Border Background="#33444444" CornerRadius="3" Padding="5">
+                        <StackPanel x:Name="TooltipRecycleOutputs">
+                            <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
+                                       Foreground="#666666"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
                 <!-- Project Uses -->
-                <TextBlock Text="Used In Projects:" Style="{StaticResource TooltipTextStyle}"
-                           Foreground="#AAAAAA" Margin="0,5,0,3"/>
-                <Border Background="#33444444" CornerRadius="3" Padding="5">
-                    <StackPanel x:Name="TooltipProjectUses">
-                        <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
-                                   Foreground="#666666"/>
-                    </StackPanel>
-                </Border>
+                <StackPanel x:Name="TooltipProjectSection">
+                    <TextBlock Text="Used In Projects:" Style="{StaticResource TooltipTextStyle}"
+                               Foreground="#AAAAAA" Margin="0,0,0,3"/>
+                    <Border Background="#33444444" CornerRadius="3" Padding="5">
+                        <StackPanel x:Name="TooltipProjectUses">
+                            <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
+                                       Foreground="#666666"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
             </StackPanel>
         </Border>
     </Grid>

@@ -88,9 +88,9 @@ public partial class App : Application
             try
             {
                 var processes = Process.GetProcessesByName(name);
-                foreach (var process in processes)
+                try
                 {
-                    using (process)
+                    foreach (var process in processes)
                     {
                         try
                         {
@@ -110,6 +110,13 @@ public partial class App : Application
                             Debug.WriteLine(
                                 $"Error checking process '{process.ProcessName}': {ex.Message}");
                         }
+                    }
+                }
+                finally
+                {
+                    foreach (var process in processes)
+                    {
+                        process.Dispose();
                     }
                 }
             }

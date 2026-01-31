@@ -114,6 +114,35 @@ public static class EventParser
         return events;
     }
 
+    /// <summary>
+    /// Parses a timer string like "ACTIVE" or "M:SS" into a TimeSpan.
+    /// </summary>
+    public static TimeSpan? ParseTimer(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return null;
+
+        var trimmed = input.Trim();
+        if (string.Equals(trimmed, "ACTIVE", StringComparison.OrdinalIgnoreCase))
+            return TimeSpan.Zero;
+
+        var match = TimerPattern.Match(trimmed);
+        if (!match.Success)
+            return null;
+
+        var parts = match.Groups[1].Value.Split(':');
+        if (parts.Length != 2)
+            return null;
+
+        if (!int.TryParse(parts[0], out var minutes))
+            return null;
+
+        if (!int.TryParse(parts[1], out var seconds))
+            return null;
+
+        return new TimeSpan(0, minutes, seconds);
+    }
+
     private static GameEvent? ParseLine(string line)
     {
         // Try primary pattern

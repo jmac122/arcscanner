@@ -680,6 +680,7 @@ public partial class OverlayWindow : Window, IDisposable
             TooltipRecommendation.Text = "KEEP FOR QUESTS";
             TooltipRecommendationBorder.Background = Theme.BrushRecommendQuest;
             TooltipRecommendation.Foreground = Theme.BrushTextDefault;
+            TooltipRecommendationBorder.Visibility = Visibility.Visible;
             return;
         }
 

@@ -18,7 +18,7 @@
                     <MenuItem Header="Unlock Overlay" Click="Unlock_Click"/>
                     <Separator/>
                     <MenuItem Header="Settings" Click="Settings_Click"/>
-                    <MenuItem Header="Scan Item (Shift+S)" Click="ScanItem_Click" IsEnabled="False"/>
+                    <MenuItem x:Name="ScanItemMenuItem" Header="Scan Item" Click="ScanItem_Click" IsEnabled="False"/>
                     <Separator/>
                     <MenuItem Header="About" Click="About_Click"/>
                     <MenuItem Header="Exit" Click="Exit_Click"/>

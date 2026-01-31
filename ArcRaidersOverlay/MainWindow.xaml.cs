@@ -39,9 +39,13 @@ public partial class MainWindow : Window, IDisposable
             TrayIcon.Icon = SystemIcons.Application;
         }
 
+        // Update menu item with configured hotkey
+        var hotkeyText = _overlayWindow.GetScanHotkeyDisplayString();
+        ScanItemMenuItem.Header = $"Scan Item ({hotkeyText})";
+
         // Show balloon tip on startup
         TrayIcon.ShowBalloonTip("ARC Raiders Overlay",
-            "Overlay is running. Press Shift+S to scan items.",
+            $"Overlay is running. Press {hotkeyText} to scan items.",
             BalloonIcon.Info);
     }
 
@@ -70,6 +74,7 @@ public partial class MainWindow : Window, IDisposable
 
     private void About_Click(object sender, RoutedEventArgs e)
     {
+        var hotkeyText = _overlayWindow.GetScanHotkeyDisplayString();
         MessageBox.Show(
             "ARC Raiders Overlay v1.0\n\n" +
             "A lightweight OCR-based overlay tool for ARC Raiders.\n\n" +
@@ -78,7 +83,7 @@ public partial class MainWindow : Window, IDisposable
             "  - Interactive minimap\n" +
             "  - Item scanner with tooltips\n\n" +
             "Hotkeys:\n" +
-            "  Shift+S - Scan item under cursor\n\n" +
+            $"  {hotkeyText} - Scan item under cursor\n\n" +
             "Based on the RatScanner architecture.",
             "About ARC Raiders Overlay",
             MessageBoxButton.OK,

@@ -67,11 +67,11 @@ public partial class OverlayWindow : Window, IDisposable
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        _isLocked = true;
-        LockButton.Content = "Unlock";
-
-        // Make window click-through
-        SetClickThrough(true);
+        // Start UNLOCKED so user can interact with the overlay
+        // They can lock it (click-through) once they're ready
+        _isLocked = false;
+        LockButton.Content = "Lock";
+        SetClickThrough(false);
 
         // Initialize managers
         try
@@ -145,7 +145,7 @@ public partial class OverlayWindow : Window, IDisposable
         _hotkeyManager.RegisterHotkey(HotkeyManager.SCAN_HOTKEY_ID, modifiers, key);
     }
 
-    private string GetHotkeyDisplayString()
+    public string GetScanHotkeyDisplayString()
     {
         if (_configManager == null) return "Ctrl+Shift+S";
 
@@ -172,7 +172,7 @@ public partial class OverlayWindow : Window, IDisposable
 
     private void UpdateScanStatusWithHotkey()
     {
-        UpdateScanStatus($"Press [{GetHotkeyDisplayString()}] to scan item");
+        UpdateScanStatus($"Press [{GetScanHotkeyDisplayString()}] to scan item");
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

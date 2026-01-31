@@ -16,9 +16,6 @@ public static class Theme
     /// <summary>Darker gray for disabled/inactive text (0x888888)</summary>
     public static readonly Color TextSecondary = Color.FromRgb(0x88, 0x88, 0x88);
 
-    /// <summary>Darkest gray for placeholder text (0x666666)</summary>
-    public static readonly Color TextDisabled = Color.FromRgb(0x66, 0x66, 0x66);
-
     /// <summary>Default text color (0xCCCCCC)</summary>
     public static readonly Color TextDefault = Color.FromRgb(0xCC, 0xCC, 0xCC);
 
@@ -102,7 +99,6 @@ public static class Theme
 
     public static readonly SolidColorBrush BrushTextMuted = new(TextMuted);
     public static readonly SolidColorBrush BrushTextSecondary = new(TextSecondary);
-    public static readonly SolidColorBrush BrushTextDisabled = new(TextDisabled);
     public static readonly SolidColorBrush BrushTextDefault = new(TextDefault);
 
     public static readonly SolidColorBrush BrushEventDrop = new(EventDrop);
@@ -140,7 +136,6 @@ public static class Theme
     {
         BrushTextMuted.Freeze();
         BrushTextSecondary.Freeze();
-        BrushTextDisabled.Freeze();
         BrushTextDefault.Freeze();
 
         BrushEventDrop.Freeze();

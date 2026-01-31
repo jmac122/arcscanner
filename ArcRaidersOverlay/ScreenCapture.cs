@@ -19,10 +19,17 @@ public class ScreenCapture
 
         var bitmap = new Bitmap(region.Width, region.Height, PixelFormat.Format32bppArgb);
 
-        using var graphics = Graphics.FromImage(bitmap);
-        graphics.CopyFromScreen(region.X, region.Y, 0, 0, region.Size, CopyPixelOperation.SourceCopy);
-
-        return bitmap;
+        try
+        {
+            using var graphics = Graphics.FromImage(bitmap);
+            graphics.CopyFromScreen(region.X, region.Y, 0, 0, region.Size, CopyPixelOperation.SourceCopy);
+            return bitmap;
+        }
+        catch
+        {
+            bitmap.Dispose();
+            throw;
+        }
     }
 
     /// <summary>

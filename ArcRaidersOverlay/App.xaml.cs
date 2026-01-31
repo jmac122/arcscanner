@@ -8,11 +8,17 @@ public partial class App : Application
 {
     private MainWindow? _mainWindow;
     private OverlayWindow? _overlayWindow;
+    private bool _isShuttingDown;
 
     private void OnStartup(object sender, StartupEventArgs e)
     {
         // Check elevation status and warn if needed
+        // This may trigger a restart with admin privileges
         CheckElevationStatus();
+
+        // If we're restarting as admin, don't create any windows
+        if (_isShuttingDown)
+            return;
 
         // Create and show the overlay window
         _overlayWindow = new OverlayWindow();
@@ -24,7 +30,7 @@ public partial class App : Application
         // Don't show the main window - it just manages the tray icon
     }
 
-    private static void CheckElevationStatus()
+    private void CheckElevationStatus()
     {
         var isElevated = IsRunningAsAdmin();
         var gameElevated = IsGameRunningElevated();
@@ -120,7 +126,7 @@ public partial class App : Application
     /// <summary>
     /// Restarts the application with admin privileges.
     /// </summary>
-    private static void RestartAsAdmin()
+    private void RestartAsAdmin()
     {
         try
         {
@@ -135,6 +141,7 @@ public partial class App : Application
             };
 
             Process.Start(startInfo);
+            _isShuttingDown = true;
             Current.Shutdown();
         }
         catch (System.ComponentModel.Win32Exception)

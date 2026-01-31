@@ -80,9 +80,8 @@ public class HotkeyManager : IDisposable
 
         foreach (var id in _registeredHotkeys.ToList())
         {
-            UnregisterHotKey(_hwnd, id);
+            UnregisterHotkey(id);
         }
-        _registeredHotkeys.Clear();
 
         GC.SuppressFinalize(this);
     }

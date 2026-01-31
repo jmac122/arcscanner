@@ -63,6 +63,7 @@ public class OcrManager : IDisposable
 
         BitmapData? sourceData = null;
         BitmapData? resultData = null;
+        var success = false;
 
         try
         {
@@ -99,6 +100,7 @@ public class OcrManager : IDisposable
 
             // Copy processed pixels to result
             Marshal.Copy(pixels, 0, resultData.Scan0, byteCount);
+            success = true;
         }
         finally
         {
@@ -106,6 +108,10 @@ public class OcrManager : IDisposable
                 source.UnlockBits(sourceData);
             if (resultData != null)
                 result.UnlockBits(resultData);
+
+            // Dispose result bitmap if processing failed
+            if (!success)
+                result.Dispose();
         }
 
         return result;

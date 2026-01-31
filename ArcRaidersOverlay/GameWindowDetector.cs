@@ -24,8 +24,6 @@ public class GameWindowDetector : IDisposable
     [DllImport("user32.dll")]
     private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
 
-    [DllImport("user32.dll")]
-    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
 
     [DllImport("user32.dll")]
     private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
@@ -57,15 +55,6 @@ public class GameWindowDetector : IDisposable
 
         public int Width => Right - Left;
         public int Height => Bottom - Top;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct MONITORINFO
-    {
-        public int cbSize;
-        public RECT rcMonitor;
-        public RECT rcWork;
-        public uint dwFlags;
     }
 
     #endregion
@@ -115,14 +104,6 @@ public class GameWindowDetector : IDisposable
         // Do an immediate check
         DetectGameWindow();
         _pollTimer.Start();
-    }
-
-    /// <summary>
-    /// Stops monitoring for the game window.
-    /// </summary>
-    public void StopMonitoring()
-    {
-        _pollTimer.Stop();
     }
 
     private void OnPollTick(object? sender, EventArgs e)
@@ -247,14 +228,11 @@ public class GameWindowDetector : IDisposable
 
         var monitor = MonitorFromWindow(_gameWindowHandle, MONITOR_DEFAULTTONEAREST);
 
-        var monitorInfo = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
-        GetMonitorInfo(monitor, ref monitorInfo);
-
         // Get DPI for the monitor
-        uint dpiX = 96, dpiY = 96;
+        uint dpiX = 96;
         try
         {
-            GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, out dpiX, out dpiY);
+            GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, out dpiX, out _);
         }
         catch
         {
@@ -265,19 +243,6 @@ public class GameWindowDetector : IDisposable
         {
             Handle = _gameWindowHandle,
             Bounds = new System.Drawing.Rectangle(rect.Left, rect.Top, rect.Width, rect.Height),
-            MonitorHandle = monitor,
-            MonitorBounds = new System.Drawing.Rectangle(
-                monitorInfo.rcMonitor.Left,
-                monitorInfo.rcMonitor.Top,
-                monitorInfo.rcMonitor.Width,
-                monitorInfo.rcMonitor.Height),
-            WorkArea = new System.Drawing.Rectangle(
-                monitorInfo.rcWork.Left,
-                monitorInfo.rcWork.Top,
-                monitorInfo.rcWork.Width,
-                monitorInfo.rcWork.Height),
-            DpiX = dpiX,
-            DpiY = dpiY,
             ScaleFactor = dpiX / 96.0
         };
     }
@@ -333,24 +298,8 @@ public class GameWindowInfo
     /// <summary>Window bounds in screen coordinates.</summary>
     public System.Drawing.Rectangle Bounds { get; init; }
 
-    /// <summary>Monitor handle.</summary>
-    public IntPtr MonitorHandle { get; init; }
-
-    /// <summary>Full monitor bounds.</summary>
-    public System.Drawing.Rectangle MonitorBounds { get; init; }
-
-    /// <summary>Monitor work area (excluding taskbar).</summary>
-    public System.Drawing.Rectangle WorkArea { get; init; }
-
-    /// <summary>Horizontal DPI.</summary>
-    public uint DpiX { get; init; }
-
-    /// <summary>Vertical DPI.</summary>
-    public uint DpiY { get; init; }
-
     /// <summary>Scale factor (1.0 = 100%, 1.5 = 150%, 2.0 = 200%).</summary>
     public double ScaleFactor { get; init; }
-
 }
 
 /// <summary>

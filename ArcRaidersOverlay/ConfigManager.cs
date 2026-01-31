@@ -115,6 +115,13 @@ public class ConfigManager
 
 public class AppConfig
 {
+    // Resolution preset constants
+    public const string Resolution1080p = "1080p";
+    public const string Resolution1440p = "1440p";
+    public const string Resolution4K = "4K";
+    public const string Resolution2160p = "2160p";  // Alias for 4K
+    public const string ResolutionCustom = "Custom";
+
     public string TessdataPath { get; set; } = "";
     public RegionConfig EventsRegion { get; set; } = new();
     public RegionConfig TooltipRegion { get; set; } = new();
@@ -264,9 +271,9 @@ public class AppConfig
 
     /// <summary>
     /// Game resolution preset. Affects scan region size and icon matching.
-    /// Values: "1080p", "1440p", "4K", "Custom"
+    /// Use the Resolution* constants (Resolution1080p, Resolution1440p, Resolution4K, ResolutionCustom).
     /// </summary>
-    public string GameResolution { get; set; } = "1080p";
+    public string GameResolution { get; set; } = Resolution1080p;
 
     /// <summary>
     /// Size of inventory icons at the current resolution (pixels).
@@ -286,7 +293,7 @@ public class AppConfig
 
         switch (resolution)
         {
-            case "1080p":
+            case Resolution1080p:
                 ScanRegionWidth = 400;
                 ScanRegionHeight = 350;
                 ScanOffsetX = 100;
@@ -294,7 +301,7 @@ public class AppConfig
                 IconSize = 48;  // ~48px icons at 1080p
                 break;
 
-            case "1440p":
+            case Resolution1440p:
                 ScanRegionWidth = 500;
                 ScanRegionHeight = 550;
                 ScanOffsetX = 10;      // Tooltip is right next to the icon
@@ -302,8 +309,8 @@ public class AppConfig
                 IconSize = 62;
                 break;
 
-            case "4K":
-            case "2160p":
+            case Resolution4K:
+            case Resolution2160p:
                 ScanRegionWidth = 700;
                 ScanRegionHeight = 650;
                 ScanOffsetX = 200;
@@ -311,7 +318,7 @@ public class AppConfig
                 IconSize = 96;  // ~96px icons at 4K
                 break;
 
-            case "Custom":
+            case ResolutionCustom:
                 // Don't modify values - user has customized them
                 break;
             default:

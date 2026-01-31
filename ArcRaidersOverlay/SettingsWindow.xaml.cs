@@ -175,10 +175,10 @@ public partial class SettingsWindow : Window
         if (ResolutionPreset.SelectedItem is not ComboBoxItem selectedItem)
             return;
 
-        var resolution = selectedItem.Tag?.ToString() ?? "1080p";
+        var resolution = selectedItem.Tag?.ToString() ?? AppConfig.Resolution1080p;
 
         // Don't update values if Custom is selected
-        if (resolution == "Custom")
+        if (resolution == AppConfig.ResolutionCustom)
             return;
 
         // Apply preset values to the UI
@@ -322,7 +322,7 @@ public partial class SettingsWindow : Window
             // Save resolution preset
             if (ResolutionPreset.SelectedItem is ComboBoxItem selectedResolution)
             {
-                config.GameResolution = selectedResolution.Tag?.ToString() ?? "1080p";
+                config.GameResolution = selectedResolution.Tag?.ToString() ?? AppConfig.Resolution1080p;
             }
 
             // Game detection settings

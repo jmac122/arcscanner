@@ -48,6 +48,12 @@ public partial class CalibrationWindow : Window
         KeyDown += OnKeyDown;
     }
 
+    protected override void OnClosed(EventArgs e)
+    {
+        _gameDetector.Dispose();
+        base.OnClosed(e);
+    }
+
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         // Get virtual screen bounds (covers all monitors)

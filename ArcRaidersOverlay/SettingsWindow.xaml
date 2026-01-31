@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Overlay Settings"
-        Width="500" Height="600"
+        Width="500" Height="720"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#1a1a1a">
@@ -32,6 +32,7 @@
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -107,8 +108,38 @@
             </Grid>
         </GroupBox>
 
+        <!-- Game Detection Settings -->
+        <GroupBox Grid.Row="3" Header="Game Detection (Multi-Monitor Support)" Foreground="White"
+                  BorderBrush="#555555" Margin="0,0,0,15">
+            <StackPanel Margin="10">
+                <CheckBox x:Name="UseGameRelative" Content="Use game-relative coordinates (recommended)"
+                          Margin="0,0,0,5"/>
+                <TextBlock Text="Stores calibration relative to game window position"
+                           Foreground="#888888" FontSize="10" Margin="20,0,0,10"/>
+
+                <CheckBox x:Name="FollowGameWindow" Content="Overlay follows game window"
+                          Margin="0,0,0,5"/>
+                <TextBlock Text="Automatically positions overlay when game moves"
+                           Foreground="#888888" FontSize="10" Margin="20,0,0,10"/>
+
+                <Grid Margin="0,5,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Overlay offset: X=" VerticalAlignment="Center"/>
+                    <TextBox x:Name="OverlayOffsetX" Grid.Column="1" Margin="5,0"/>
+                    <TextBlock Grid.Column="2" Text="Y=" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    <TextBox x:Name="OverlayOffsetY" Grid.Column="3" Margin="5,0"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
         <!-- General Settings -->
-        <GroupBox Grid.Row="3" Header="General Settings" Foreground="White"
+        <GroupBox Grid.Row="4" Header="General Settings" Foreground="White"
                   BorderBrush="#555555" Margin="0,0,0,15">
             <StackPanel Margin="10">
                 <CheckBox x:Name="StartWithWindows" Content="Start with Windows" Margin="0,0,0,10"/>
@@ -129,7 +160,7 @@
         </GroupBox>
 
         <!-- OCR Settings -->
-        <GroupBox Grid.Row="4" Header="OCR Settings" Foreground="White"
+        <GroupBox Grid.Row="5" Header="OCR Settings" Foreground="White"
                   BorderBrush="#555555" Margin="0,0,0,15">
             <Grid Margin="10">
                 <Grid.ColumnDefinitions>
@@ -144,13 +175,14 @@
         </GroupBox>
 
         <!-- Instructions -->
-        <Border Grid.Row="5" Background="#252525" CornerRadius="5" Padding="10" Margin="0,0,0,15">
+        <Border Grid.Row="6" Background="#252525" CornerRadius="5" Padding="10" Margin="0,0,0,15">
             <StackPanel>
                 <TextBlock Text="Calibration Instructions:" FontWeight="SemiBold" Margin="0,0,0,5"/>
                 <TextBlock TextWrapping="Wrap" Foreground="#AAAAAA" FontSize="11">
-                    1. Click "Calibrate" to capture a screenshot of your game.
-                    2. Draw a rectangle around the region you want to capture.
-                    3. The coordinates will be automatically saved.
+                    1. Make sure ARC Raiders is running (the game window will be highlighted).
+                    2. Click "Calibrate" to capture a screenshot of all your monitors.
+                    3. Draw a rectangle around the region you want to capture.
+                    4. Coordinates are saved relative to the game window for multi-monitor support.
 
                     Tip: For best OCR results, capture only the text area without decorations.
                 </TextBlock>
@@ -158,7 +190,7 @@
         </Border>
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Reset to Defaults" Click="ResetDefaults_Click" Margin="0,0,10,0"/>
             <Button Content="Cancel" Click="Cancel_Click" Margin="0,0,10,0"/>
             <Button Content="Save" Click="Save_Click" Background="#007ACC"/>

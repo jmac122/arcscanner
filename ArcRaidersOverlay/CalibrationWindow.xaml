@@ -17,6 +17,9 @@
         <!-- Dark overlay -->
         <Rectangle x:Name="DarkOverlay" Fill="#66000000"/>
 
+        <!-- Canvas for game window overlay and other markers -->
+        <Canvas x:Name="OverlayCanvas" IsHitTestVisible="False"/>
+
         <!-- Selection rectangle -->
         <Rectangle x:Name="SelectionRect"
                    Stroke="#00AAFF" StrokeThickness="2"

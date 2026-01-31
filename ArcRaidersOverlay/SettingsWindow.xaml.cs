@@ -28,9 +28,10 @@ public partial class SettingsWindow : Window
     /// </summary>
     /// <param name="regionName">Display name for the region being calibrated</param>
     /// <param name="textBoxes">The TextBox group to update with the selected region</param>
-    private static void CalibrateRegion(string regionName, RegionTextBoxes textBoxes)
+    /// <param name="useGameRelative">Whether to use game-relative coordinates</param>
+    private static void CalibrateRegion(string regionName, RegionTextBoxes textBoxes, bool useGameRelative = true)
     {
-        var calibrationWindow = new CalibrationWindow(regionName);
+        var calibrationWindow = new CalibrationWindow(regionName, useGameRelative);
         if (calibrationWindow.ShowDialog() == true)
         {
             var region = calibrationWindow.SelectedRegion;
@@ -79,6 +80,12 @@ public partial class SettingsWindow : Window
         LoadRegionToTextBoxes(config.EventsRegion, EventsRegionBoxes);
         LoadRegionToTextBoxes(config.TooltipRegion, TooltipRegionBoxes);
 
+        // Game detection settings
+        UseGameRelative.IsChecked = config.UseGameRelativeCoordinates;
+        FollowGameWindow.IsChecked = config.FollowGameWindow;
+        OverlayOffsetX.Text = config.OverlayOffsetX.ToString();
+        OverlayOffsetY.Text = config.OverlayOffsetY.ToString();
+
         // General settings
         StartWithWindows.IsChecked = config.StartWithWindows;
         StartMinimized.IsChecked = config.StartMinimized;
@@ -90,12 +97,14 @@ public partial class SettingsWindow : Window
 
     private void CalibrateEvents_Click(object sender, RoutedEventArgs e)
     {
-        CalibrateRegion("Events Region", EventsRegionBoxes);
+        var useGameRelative = UseGameRelative.IsChecked ?? true;
+        CalibrateRegion("Events Region", EventsRegionBoxes, useGameRelative);
     }
 
     private void CalibrateTooltip_Click(object sender, RoutedEventArgs e)
     {
-        CalibrateRegion("Tooltip Region", TooltipRegionBoxes);
+        var useGameRelative = UseGameRelative.IsChecked ?? true;
+        CalibrateRegion("Tooltip Region", TooltipRegionBoxes, useGameRelative);
     }
 
     private void BrowseTessdata_Click(object sender, RoutedEventArgs e)
@@ -142,6 +151,12 @@ public partial class SettingsWindow : Window
             config.EventsRegion = ParseRegionFromTextBoxes(EventsRegionBoxes);
             config.TooltipRegion = ParseRegionFromTextBoxes(TooltipRegionBoxes);
 
+            // Game detection settings
+            config.UseGameRelativeCoordinates = UseGameRelative.IsChecked ?? true;
+            config.FollowGameWindow = FollowGameWindow.IsChecked ?? true;
+            config.OverlayOffsetX = int.Parse(OverlayOffsetX.Text);
+            config.OverlayOffsetY = int.Parse(OverlayOffsetY.Text);
+
             // General settings
             config.StartWithWindows = StartWithWindows.IsChecked ?? false;
             config.StartMinimized = StartMinimized.IsChecked ?? false;
@@ -160,7 +175,7 @@ public partial class SettingsWindow : Window
         }
         catch (FormatException)
         {
-            MessageBox.Show("Please enter valid numbers for all region coordinates.",
+            MessageBox.Show("Please enter valid numbers for all fields.",
                 "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         catch (Exception ex)

@@ -107,6 +107,34 @@ public class AppConfig
     public bool StartWithWindows { get; set; }
     public bool StartMinimized { get; set; }
     public int EventPollIntervalSeconds { get; set; } = 15;
+
+    // Game window detection settings
+    /// <summary>
+    /// When true, regions are stored relative to game window position.
+    /// This allows calibration to work across different monitors/positions.
+    /// </summary>
+    public bool UseGameRelativeCoordinates { get; set; } = true;
+
+    /// <summary>
+    /// When true, the overlay will automatically follow the game window.
+    /// </summary>
+    public bool FollowGameWindow { get; set; } = true;
+
+    /// <summary>
+    /// Offset from game window edge when following (X).
+    /// </summary>
+    public int OverlayOffsetX { get; set; } = 10;
+
+    /// <summary>
+    /// Offset from game window edge when following (Y).
+    /// </summary>
+    public int OverlayOffsetY { get; set; } = 10;
+
+    /// <summary>
+    /// Last known game window resolution (for detecting resolution changes).
+    /// </summary>
+    public int LastGameWidth { get; set; }
+    public int LastGameHeight { get; set; }
 }
 
 public class RegionConfig

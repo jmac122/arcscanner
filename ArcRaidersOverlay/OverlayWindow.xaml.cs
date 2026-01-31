@@ -34,9 +34,11 @@ public partial class OverlayWindow : Window, IDisposable
     private DataManager? _dataManager;
     private HotkeyManager? _hotkeyManager;
     private ConfigManager? _configManager;
+    private GameWindowDetector? _gameWindowDetector;
     private bool _isLocked;
     private bool _isClickThrough;
     private bool _disposed;
+    private bool _isFollowingGame;
 
     public OverlayWindow()
     {
@@ -97,8 +99,17 @@ public partial class OverlayWindow : Window, IDisposable
             var source = HwndSource.FromHwnd(hwnd);
             source?.AddHook(WndProc);
 
-            // Apply saved position
-            if (_configManager.Config.OverlayX >= 0)
+            // Initialize game window detector
+            _gameWindowDetector = new GameWindowDetector();
+            _gameWindowDetector.GameWindowChanged += OnGameWindowChanged;
+            _gameWindowDetector.StartMonitoring();
+
+            // Apply saved position or follow game
+            if (_configManager.Config.FollowGameWindow && _gameWindowDetector.IsGameRunning)
+            {
+                FollowGameWindow();
+            }
+            else if (_configManager.Config.OverlayX >= 0)
             {
                 Left = _configManager.Config.OverlayX;
                 Top = _configManager.Config.OverlayY;
@@ -108,6 +119,7 @@ public partial class OverlayWindow : Window, IDisposable
             _eventPollTimer.Start();
             OnEventPollTick(this, EventArgs.Empty);
 
+            UpdateGameStatus();
             UpdateScanStatus("Press [Shift+S] to scan item");
         }
         catch (Exception ex)
@@ -182,6 +194,87 @@ public partial class OverlayWindow : Window, IDisposable
         }
     }
 
+    #region Game Window Detection
+
+    private void OnGameWindowChanged(object? sender, GameWindowEventArgs e)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (e.IsDetected && e.WindowInfo != null)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Game detected: {e.WindowInfo.Bounds.Width}x{e.WindowInfo.Bounds.Height} " +
+                    $"@ ({e.WindowInfo.Bounds.X}, {e.WindowInfo.Bounds.Y}) " +
+                    $"DPI: {e.WindowInfo.ScaleFactor:P0}");
+
+                // Check for resolution change
+                var config = _configManager?.Config;
+                if (config != null)
+                {
+                    if (config.LastGameWidth > 0 &&
+                        (config.LastGameWidth != e.WindowInfo.Bounds.Width ||
+                         config.LastGameHeight != e.WindowInfo.Bounds.Height))
+                    {
+                        System.Diagnostics.Debug.WriteLine(
+                            $"Resolution changed from {config.LastGameWidth}x{config.LastGameHeight}");
+                        // Could trigger recalibration prompt here
+                    }
+
+                    config.LastGameWidth = e.WindowInfo.Bounds.Width;
+                    config.LastGameHeight = e.WindowInfo.Bounds.Height;
+                }
+
+                if (_configManager?.Config.FollowGameWindow == true)
+                {
+                    FollowGameWindow();
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Game window lost");
+            }
+
+            UpdateGameStatus();
+        });
+    }
+
+    private void FollowGameWindow()
+    {
+        if (_gameWindowDetector?.CurrentWindow == null || _configManager == null)
+            return;
+
+        var config = _configManager.Config;
+        var pos = _gameWindowDetector.GetRecommendedOverlayPosition(
+            config.OverlayOffsetX, config.OverlayOffsetY);
+
+        Left = pos.X;
+        Top = pos.Y;
+        _isFollowingGame = true;
+    }
+
+    private void UpdateGameStatus()
+    {
+        // Could update a status indicator in the UI
+        var isRunning = _gameWindowDetector?.IsGameRunning ?? false;
+        System.Diagnostics.Debug.WriteLine($"Game status: {(isRunning ? "Running" : "Not detected")}");
+    }
+
+    /// <summary>
+    /// Gets the actual screen region for capture, converting from game-relative if needed.
+    /// </summary>
+    private RegionConfig GetScreenRegion(RegionConfig configRegion)
+    {
+        if (_configManager?.Config.UseGameRelativeCoordinates == true &&
+            _gameWindowDetector?.CurrentWindow != null)
+        {
+            return _gameWindowDetector.GameRelativeToScreen(configRegion);
+        }
+
+        return configRegion;
+    }
+
+    #endregion
+
     #region Event Polling
 
     private void OnEventPollTick(object? sender, EventArgs e)
@@ -202,8 +295,9 @@ public partial class OverlayWindow : Window, IDisposable
                 return;
             }
 
-            // Capture events region
-            using var bitmap = _screenCapture.CaptureRegion(config.EventsRegion);
+            // Capture events region (convert to screen coords if using game-relative)
+            var eventsRegion = GetScreenRegion(config.EventsRegion);
+            using var bitmap = _screenCapture.CaptureRegion(eventsRegion);
             var text = _ocrManager.Recognize(bitmap);
 
             // Parse events
@@ -409,8 +503,9 @@ public partial class OverlayWindow : Window, IDisposable
                 return;
             }
 
-            // Capture tooltip region
-            using var bitmap = _screenCapture.CaptureRegion(config.TooltipRegion);
+            // Capture tooltip region (convert to screen coords if using game-relative)
+            var tooltipRegion = GetScreenRegion(config.TooltipRegion);
+            using var bitmap = _screenCapture.CaptureRegion(tooltipRegion);
             var text = _ocrManager.Recognize(bitmap);
 
             if (string.IsNullOrWhiteSpace(text))
@@ -591,6 +686,7 @@ public partial class OverlayWindow : Window, IDisposable
 
         _eventPollTimer.Stop();
         _tooltipHideTimer.Stop();
+        _gameWindowDetector?.Dispose();
         _hotkeyManager?.Dispose();
         _ocrManager?.Dispose();
 

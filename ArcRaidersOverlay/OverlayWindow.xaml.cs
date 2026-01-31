@@ -235,7 +235,7 @@ public partial class OverlayWindow : Window, IDisposable
                 {
                     Text = "No events detected",
                     Style = (Style)FindResource("EventTextStyle"),
-                    Foreground = new SolidColorBrush(Color.FromRgb(0xAA, 0xAA, 0xAA)),
+                    Foreground = Theme.BrushTextMuted,
                     FontStyle = FontStyles.Italic
                 });
                 ActiveEventBorder.Visibility = Visibility.Collapsed;
@@ -252,7 +252,7 @@ public partial class OverlayWindow : Window, IDisposable
                 var icon = new TextBlock
                 {
                     Text = GetEventIcon(evt.Name),
-                    Foreground = new SolidColorBrush(GetEventColor(evt.Name)),
+                    Foreground = GetEventBrush(evt.Name),
                     Margin = new Thickness(0, 0, 5, 0),
                     FontSize = 11
                 };
@@ -267,14 +267,14 @@ public partial class OverlayWindow : Window, IDisposable
                 {
                     Text = $" @ {evt.Location}",
                     Style = (Style)FindResource("EventTextStyle"),
-                    Foreground = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x88))
+                    Foreground = Theme.BrushTextSecondary
                 };
 
                 var timerText = new TextBlock
                 {
                     Text = $" [{evt.Timer}]",
                     Style = (Style)FindResource("EventTextStyle"),
-                    Foreground = new SolidColorBrush(GetTimerColor(evt.Timer))
+                    Foreground = GetTimerBrush(evt.Timer)
                 };
 
                 panel.Children.Add(icon);
@@ -316,29 +316,29 @@ public partial class OverlayWindow : Window, IDisposable
         return "[*]";
     }
 
-    private static Color GetEventColor(string eventName)
+    private static SolidColorBrush GetEventBrush(string eventName)
     {
         var lower = eventName.ToLowerInvariant();
-        if (lower.Contains("drop")) return Color.FromRgb(0xFF, 0xAA, 0x00);
-        if (lower.Contains("storm")) return Color.FromRgb(0x88, 0x88, 0xFF);
-        if (lower.Contains("convoy")) return Color.FromRgb(0xFF, 0x88, 0x88);
-        if (lower.Contains("extraction")) return Color.FromRgb(0x88, 0xFF, 0x88);
-        return Color.FromRgb(0xCC, 0xCC, 0xCC);
+        if (lower.Contains("drop")) return Theme.BrushEventDrop;
+        if (lower.Contains("storm")) return Theme.BrushEventStorm;
+        if (lower.Contains("convoy")) return Theme.BrushEventConvoy;
+        if (lower.Contains("extraction")) return Theme.BrushEventExtraction;
+        return Theme.BrushTextDefault;
     }
 
-    private static Color GetTimerColor(string timer)
+    private static SolidColorBrush GetTimerBrush(string timer)
     {
         if (timer.Contains("ACTIVE", StringComparison.OrdinalIgnoreCase))
-            return Color.FromRgb(0x00, 0xFF, 0x00);
+            return Theme.BrushTimerActive;
 
         // Parse minutes and color code
         if (int.TryParse(timer.Split(':')[0], out int minutes))
         {
-            if (minutes < 2) return Color.FromRgb(0xFF, 0x44, 0x44);
-            if (minutes < 5) return Color.FromRgb(0xFF, 0xAA, 0x00);
+            if (minutes < 2) return Theme.BrushTimerUrgent;
+            if (minutes < 5) return Theme.BrushTimerWarning;
         }
 
-        return Color.FromRgb(0x88, 0xFF, 0x88);
+        return Theme.BrushTimerNormal;
     }
 
     #endregion
@@ -473,22 +473,14 @@ public partial class OverlayWindow : Window, IDisposable
             {
                 foreach (var output in item.RecycleOutputs)
                 {
-                    TooltipRecycleOutputs.Children.Add(new TextBlock
-                    {
-                        Text = $"  {output.Key}: {output.Value}",
-                        Style = (Style)FindResource("TooltipTextStyle"),
-                        Foreground = new SolidColorBrush(Color.FromRgb(0xAA, 0xAA, 0xAA))
-                    });
+                    TooltipRecycleOutputs.Children.Add(CreateTooltipTextBlock(
+                        $"  {output.Key}: {output.Value}", Theme.BrushTextMuted));
                 }
             }
             else
             {
-                TooltipRecycleOutputs.Children.Add(new TextBlock
-                {
-                    Text = "  Not recyclable",
-                    Style = (Style)FindResource("TooltipTextStyle"),
-                    Foreground = new SolidColorBrush(Color.FromRgb(0x66, 0x66, 0x66))
-                });
+                TooltipRecycleOutputs.Children.Add(CreateTooltipTextBlock(
+                    "  Not recyclable", Theme.BrushTextDisabled));
             }
 
             // Project uses
@@ -497,22 +489,14 @@ public partial class OverlayWindow : Window, IDisposable
             {
                 foreach (var project in item.ProjectUses)
                 {
-                    TooltipProjectUses.Children.Add(new TextBlock
-                    {
-                        Text = $"  {project}",
-                        Style = (Style)FindResource("TooltipTextStyle"),
-                        Foreground = new SolidColorBrush(Color.FromRgb(0x88, 0xAA, 0xFF))
-                    });
+                    TooltipProjectUses.Children.Add(CreateTooltipTextBlock(
+                        $"  {project}", Theme.BrushTooltipProject));
                 }
             }
             else
             {
-                TooltipProjectUses.Children.Add(new TextBlock
-                {
-                    Text = "  Not used in projects",
-                    Style = (Style)FindResource("TooltipTextStyle"),
-                    Foreground = new SolidColorBrush(Color.FromRgb(0x66, 0x66, 0x66))
-                });
+                TooltipProjectUses.Children.Add(CreateTooltipTextBlock(
+                    "  Not used in projects", Theme.BrushTextDisabled));
             }
 
             TooltipPanel.Visibility = Visibility.Visible;
@@ -529,6 +513,23 @@ public partial class OverlayWindow : Window, IDisposable
         {
             TooltipPanel.Visibility = Visibility.Collapsed;
         });
+    }
+
+    #endregion
+
+    #region UI Helpers
+
+    /// <summary>
+    /// Creates a styled TextBlock for tooltip content. Reduces code duplication.
+    /// </summary>
+    private TextBlock CreateTooltipTextBlock(string text, SolidColorBrush foreground)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            Style = (Style)FindResource("TooltipTextStyle"),
+            Foreground = foreground
+        };
     }
 
     #endregion

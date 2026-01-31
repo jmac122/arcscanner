@@ -1,0 +1,44 @@
+{
+  "maps": [
+    {
+      "name": "Dread Canyon",
+      "fileName": "dread_canyon.png",
+      "aliases": ["dread", "canyon"]
+    },
+    {
+      "name": "Blackstone Quarry",
+      "fileName": "blackstone_quarry.png",
+      "aliases": ["blackstone", "quarry"]
+    },
+    {
+      "name": "Wraith Basin",
+      "fileName": "wraith_basin.png",
+      "aliases": ["wraith", "basin"]
+    },
+    {
+      "name": "Thornback Ridge",
+      "fileName": "thornback_ridge.png",
+      "aliases": ["thornback", "ridge"]
+    },
+    {
+      "name": "Dustfall Expanse",
+      "fileName": "dustfall_expanse.png",
+      "aliases": ["dustfall", "expanse"]
+    },
+    {
+      "name": "Sunken Reach",
+      "fileName": "sunken_reach.png",
+      "aliases": ["sunken", "reach"]
+    },
+    {
+      "name": "Ironwood Forest",
+      "fileName": "ironwood_forest.png",
+      "aliases": ["ironwood", "forest"]
+    },
+    {
+      "name": "Ashland Dunes",
+      "fileName": "ashland_dunes.png",
+      "aliases": ["ashland", "dunes"]
+    }
+  ]
+}

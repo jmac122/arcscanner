@@ -1,22 +1,62 @@
 using System.Text.RegularExpressions;
 using ArcRaidersOverlay.Models;
+using Newtonsoft.Json;
 
 namespace ArcRaidersOverlay;
 
 public static class EventParser
 {
-    // Known map names in ARC Raiders
-    private static readonly string[] KnownMaps =
+    // Maps loaded from configuration file (supports user customization)
+    private static readonly List<MapInfo> KnownMaps;
+
+    // Fallback maps if config file is missing
+    private static readonly List<MapInfo> DefaultMaps = new()
     {
-        "Dread Canyon",
-        "Blackstone Quarry",
-        "Wraith Basin",
-        "Thornback Ridge",
-        "Dustfall Expanse",
-        "Sunken Reach",
-        "Ironwood Forest",
-        "Ashland Dunes"
+        new() { Name = "Dread Canyon", FileName = "dread_canyon.png", Aliases = new() { "dread", "canyon" } },
+        new() { Name = "Blackstone Quarry", FileName = "blackstone_quarry.png", Aliases = new() { "blackstone", "quarry" } },
+        new() { Name = "Wraith Basin", FileName = "wraith_basin.png", Aliases = new() { "wraith", "basin" } },
+        new() { Name = "Thornback Ridge", FileName = "thornback_ridge.png", Aliases = new() { "thornback", "ridge" } },
+        new() { Name = "Dustfall Expanse", FileName = "dustfall_expanse.png", Aliases = new() { "dustfall", "expanse" } },
+        new() { Name = "Sunken Reach", FileName = "sunken_reach.png", Aliases = new() { "sunken", "reach" } },
+        new() { Name = "Ironwood Forest", FileName = "ironwood_forest.png", Aliases = new() { "ironwood", "forest" } },
+        new() { Name = "Ashland Dunes", FileName = "ashland_dunes.png", Aliases = new() { "ashland", "dunes" } }
     };
+
+    static EventParser()
+    {
+        KnownMaps = LoadMapsFromConfig();
+    }
+
+    private static List<MapInfo> LoadMapsFromConfig()
+    {
+        try
+        {
+            var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "maps", "maps.json");
+
+            if (!File.Exists(configPath))
+            {
+                System.Diagnostics.Debug.WriteLine($"Maps config not found at {configPath}, using defaults");
+                return DefaultMaps;
+            }
+
+            var json = File.ReadAllText(configPath);
+            var config = JsonConvert.DeserializeObject<MapsConfig>(json);
+
+            if (config?.Maps == null || config.Maps.Count == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("Maps config empty, using defaults");
+                return DefaultMaps;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Loaded {config.Maps.Count} maps from config");
+            return config.Maps;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading maps config: {ex.Message}");
+            return DefaultMaps;
+        }
+    }
 
     // Regex patterns for parsing event text
     // Pattern: Event Name - Location - Timer (e.g., "Supply Drop - Dread Canyon - 5:32")
@@ -105,8 +145,9 @@ public static class EventParser
 
     /// <summary>
     /// Detects the current map from text (location names, map markers, etc.)
+    /// Returns the map info if found, null otherwise.
     /// </summary>
-    public static string? DetectMap(string text)
+    public static MapInfo? DetectMapInfo(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return null;
@@ -115,14 +156,20 @@ public static class EventParser
 
         foreach (var map in KnownMaps)
         {
-            // Check for exact or partial match
-            if (normalized.Contains(map.ToLowerInvariant()))
+            // Check for exact name match
+            if (normalized.Contains(map.Name.ToLowerInvariant()))
             {
                 return map;
             }
 
-            // Check for fuzzy match (map name words)
-            var mapWords = map.ToLowerInvariant().Split(' ');
+            // Check for alias match
+            if (map.Aliases.Any(alias => normalized.Contains(alias.ToLowerInvariant())))
+            {
+                return map;
+            }
+
+            // Check for fuzzy match (all words in map name present)
+            var mapWords = map.Name.ToLowerInvariant().Split(' ');
             if (mapWords.All(word => normalized.Contains(word)))
             {
                 return map;
@@ -131,6 +178,20 @@ public static class EventParser
 
         return null;
     }
+
+    /// <summary>
+    /// Detects the current map from text and returns just the map name.
+    /// Convenience wrapper around DetectMapInfo.
+    /// </summary>
+    public static string? DetectMap(string text)
+    {
+        return DetectMapInfo(text)?.Name;
+    }
+
+    /// <summary>
+    /// Gets the list of known maps (for UI display, etc.)
+    /// </summary>
+    public static IReadOnlyList<MapInfo> GetKnownMaps() => KnownMaps.AsReadOnly();
 
     /// <summary>
     /// Cleans OCR text by fixing common recognition errors.

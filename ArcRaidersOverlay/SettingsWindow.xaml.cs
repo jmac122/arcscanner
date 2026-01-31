@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using Microsoft.Win32;
 
 namespace ArcRaidersOverlay;
@@ -14,21 +15,69 @@ public partial class SettingsWindow : Window
         LoadSettings();
     }
 
+    #region Region Calibration Helpers
+
+    /// <summary>
+    /// Groups of TextBoxes for a calibration region (X, Y, Width, Height).
+    /// Eliminates duplicate code in calibration handlers.
+    /// </summary>
+    private record RegionTextBoxes(TextBox X, TextBox Y, TextBox Width, TextBox Height);
+
+    /// <summary>
+    /// Opens the calibration window and applies the selected region to the TextBoxes.
+    /// </summary>
+    /// <param name="regionName">Display name for the region being calibrated</param>
+    /// <param name="textBoxes">The TextBox group to update with the selected region</param>
+    private static void CalibrateRegion(string regionName, RegionTextBoxes textBoxes)
+    {
+        var calibrationWindow = new CalibrationWindow(regionName);
+        if (calibrationWindow.ShowDialog() == true)
+        {
+            var region = calibrationWindow.SelectedRegion;
+            textBoxes.X.Text = region.X.ToString();
+            textBoxes.Y.Text = region.Y.ToString();
+            textBoxes.Width.Text = region.Width.ToString();
+            textBoxes.Height.Text = region.Height.ToString();
+        }
+    }
+
+    /// <summary>
+    /// Loads a RegionConfig into the corresponding TextBoxes.
+    /// </summary>
+    private static void LoadRegionToTextBoxes(RegionConfig region, RegionTextBoxes textBoxes)
+    {
+        textBoxes.X.Text = region.X.ToString();
+        textBoxes.Y.Text = region.Y.ToString();
+        textBoxes.Width.Text = region.Width.ToString();
+        textBoxes.Height.Text = region.Height.ToString();
+    }
+
+    /// <summary>
+    /// Parses TextBoxes into a RegionConfig.
+    /// </summary>
+    private static RegionConfig ParseRegionFromTextBoxes(RegionTextBoxes textBoxes)
+    {
+        return new RegionConfig
+        {
+            X = int.Parse(textBoxes.X.Text),
+            Y = int.Parse(textBoxes.Y.Text),
+            Width = int.Parse(textBoxes.Width.Text),
+            Height = int.Parse(textBoxes.Height.Text)
+        };
+    }
+
+    #endregion
+
+    private RegionTextBoxes EventsRegionBoxes => new(EventsX, EventsY, EventsWidth, EventsHeight);
+    private RegionTextBoxes TooltipRegionBoxes => new(TooltipX, TooltipY, TooltipWidth, TooltipHeight);
+
     private void LoadSettings()
     {
         var config = _configManager.Config;
 
-        // Events region
-        EventsX.Text = config.EventsRegion.X.ToString();
-        EventsY.Text = config.EventsRegion.Y.ToString();
-        EventsWidth.Text = config.EventsRegion.Width.ToString();
-        EventsHeight.Text = config.EventsRegion.Height.ToString();
-
-        // Tooltip region
-        TooltipX.Text = config.TooltipRegion.X.ToString();
-        TooltipY.Text = config.TooltipRegion.Y.ToString();
-        TooltipWidth.Text = config.TooltipRegion.Width.ToString();
-        TooltipHeight.Text = config.TooltipRegion.Height.ToString();
+        // Load regions using helper
+        LoadRegionToTextBoxes(config.EventsRegion, EventsRegionBoxes);
+        LoadRegionToTextBoxes(config.TooltipRegion, TooltipRegionBoxes);
 
         // General settings
         StartWithWindows.IsChecked = config.StartWithWindows;
@@ -41,28 +90,12 @@ public partial class SettingsWindow : Window
 
     private void CalibrateEvents_Click(object sender, RoutedEventArgs e)
     {
-        var calibrationWindow = new CalibrationWindow("Events Region");
-        if (calibrationWindow.ShowDialog() == true)
-        {
-            var region = calibrationWindow.SelectedRegion;
-            EventsX.Text = region.X.ToString();
-            EventsY.Text = region.Y.ToString();
-            EventsWidth.Text = region.Width.ToString();
-            EventsHeight.Text = region.Height.ToString();
-        }
+        CalibrateRegion("Events Region", EventsRegionBoxes);
     }
 
     private void CalibrateTooltip_Click(object sender, RoutedEventArgs e)
     {
-        var calibrationWindow = new CalibrationWindow("Tooltip Region");
-        if (calibrationWindow.ShowDialog() == true)
-        {
-            var region = calibrationWindow.SelectedRegion;
-            TooltipX.Text = region.X.ToString();
-            TooltipY.Text = region.Y.ToString();
-            TooltipWidth.Text = region.Width.ToString();
-            TooltipHeight.Text = region.Height.ToString();
-        }
+        CalibrateRegion("Tooltip Region", TooltipRegionBoxes);
     }
 
     private void BrowseTessdata_Click(object sender, RoutedEventArgs e)
@@ -105,23 +138,9 @@ public partial class SettingsWindow : Window
         {
             var config = _configManager.Config;
 
-            // Events region
-            config.EventsRegion = new RegionConfig
-            {
-                X = int.Parse(EventsX.Text),
-                Y = int.Parse(EventsY.Text),
-                Width = int.Parse(EventsWidth.Text),
-                Height = int.Parse(EventsHeight.Text)
-            };
-
-            // Tooltip region
-            config.TooltipRegion = new RegionConfig
-            {
-                X = int.Parse(TooltipX.Text),
-                Y = int.Parse(TooltipY.Text),
-                Width = int.Parse(TooltipWidth.Text),
-                Height = int.Parse(TooltipHeight.Text)
-            };
+            // Parse regions using helper
+            config.EventsRegion = ParseRegionFromTextBoxes(EventsRegionBoxes);
+            config.TooltipRegion = ParseRegionFromTextBoxes(TooltipRegionBoxes);
 
             // General settings
             config.StartWithWindows = StartWithWindows.IsChecked ?? false;

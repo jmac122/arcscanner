@@ -109,6 +109,107 @@ public class AppConfig
     public bool StartMinimized { get; set; }
     public int EventPollIntervalSeconds { get; set; } = 15;
 
+    // Events display settings
+    /// <summary>
+    /// When true, events panel is visible on the overlay.
+    /// </summary>
+    public bool ShowEvents { get; set; } = true;
+
+    /// <summary>
+    /// When true, shows compact event view (just count + next event).
+    /// </summary>
+    public bool EventsCompactMode { get; set; } = false;
+
+    /// <summary>
+    /// Modifier keys for the events toggle hotkey.
+    /// </summary>
+    public string EventsToggleHotkeyModifier { get; set; } = "";
+
+    /// <summary>
+    /// Key for the events toggle hotkey.
+    /// </summary>
+    public string EventsToggleHotkeyKey { get; set; } = "F8";
+
+    /// <summary>
+    /// Gets the events toggle hotkey modifier as ModifierKeys enum.
+    /// </summary>
+    [JsonIgnore]
+    public ModifierKeys EventsToggleModifierKeys
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(EventsToggleHotkeyModifier))
+                return ModifierKeys.None;
+
+            ModifierKeys result = ModifierKeys.None;
+            foreach (var part in EventsToggleHotkeyModifier.Split(','))
+            {
+                if (Enum.TryParse<ModifierKeys>(part.Trim(), out var mod))
+                    result |= mod;
+            }
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Gets the events toggle key as Key enum.
+    /// </summary>
+    [JsonIgnore]
+    public Key EventsToggleKey
+    {
+        get
+        {
+            if (Enum.TryParse<Key>(EventsToggleHotkeyKey, out var key))
+                return key;
+            return Key.F8;
+        }
+    }
+
+    /// <summary>
+    /// Modifier keys for the overlay toggle hotkey.
+    /// </summary>
+    public string OverlayToggleHotkeyModifier { get; set; } = "";
+
+    /// <summary>
+    /// Key for the overlay toggle hotkey.
+    /// </summary>
+    public string OverlayToggleHotkeyKey { get; set; } = "F7";
+
+    /// <summary>
+    /// Gets the overlay toggle hotkey modifier as ModifierKeys enum.
+    /// </summary>
+    [JsonIgnore]
+    public ModifierKeys OverlayToggleModifierKeys
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(OverlayToggleHotkeyModifier))
+                return ModifierKeys.None;
+
+            ModifierKeys result = ModifierKeys.None;
+            foreach (var part in OverlayToggleHotkeyModifier.Split(','))
+            {
+                if (Enum.TryParse<ModifierKeys>(part.Trim(), out var mod))
+                    result |= mod;
+            }
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Gets the overlay toggle key as Key enum.
+    /// </summary>
+    [JsonIgnore]
+    public Key OverlayToggleKey
+    {
+        get
+        {
+            if (Enum.TryParse<Key>(OverlayToggleHotkeyKey, out var key))
+                return key;
+            return Key.F7;
+        }
+    }
+
     // Game window detection settings
     /// <summary>
     /// When true, regions are stored relative to game window position.

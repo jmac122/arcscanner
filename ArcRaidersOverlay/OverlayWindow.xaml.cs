@@ -1,3 +1,4 @@
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,6 +40,9 @@ public partial class OverlayWindow : Window, IDisposable
     private bool _isLocked;
     private bool _isClickThrough;
     private bool _disposed;
+    private static readonly string LogFilePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "ArcRaidersOverlay", "overlay.log");
 
     public OverlayWindow()
     {
@@ -64,6 +68,27 @@ public partial class OverlayWindow : Window, IDisposable
             _tooltipHideTimer.Stop();
             HideTooltip();
         };
+
+        // Clear old log on startup
+        try
+        {
+            var logDir = Path.GetDirectoryName(LogFilePath);
+            if (!string.IsNullOrEmpty(logDir))
+                Directory.CreateDirectory(logDir);
+            File.WriteAllText(LogFilePath, $"=== ArcRaidersOverlay Log Started {DateTime.Now} ===\n");
+        }
+        catch { /* Ignore logging errors */ }
+    }
+
+    private static void LogMessage(string message)
+    {
+        try
+        {
+            var logLine = $"[{DateTime.Now:HH:mm:ss}] {message}\n";
+            File.AppendAllText(LogFilePath, logLine);
+            System.Diagnostics.Debug.WriteLine(message);
+        }
+        catch { /* Ignore logging errors */ }
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -86,11 +111,21 @@ public partial class OverlayWindow : Window, IDisposable
             // Initialize OCR (may fail if tessdata not present)
             try
             {
-                _ocrManager = new OcrManager(_configManager.Config.TessdataPath);
+                var tessdataPath = _configManager.Config.TessdataPath;
+                LogMessage($"Initializing OCR with tessdata path: {tessdataPath}");
+                _ocrManager = new OcrManager(tessdataPath);
+                LogMessage("OCR initialized successfully");
             }
             catch (Exception ex)
             {
-                UpdateScanStatus($"OCR init failed: {ex.Message}");
+                var errorMsg = $"OCR init failed: {ex.Message}";
+                LogMessage($"ERROR: {errorMsg}");
+                LogMessage($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    LogMessage($"Inner exception: {ex.InnerException.Message}");
+                }
+                UpdateScanStatus(errorMsg);
             }
 
             // Initialize hotkeys
@@ -122,9 +157,17 @@ public partial class OverlayWindow : Window, IDisposable
                 Top = _configManager.Config.OverlayY;
             }
 
-            // Start event polling
-            _eventPollTimer.Start();
-            OnEventPollTick(this, EventArgs.Empty);
+            // Start event polling (only if events are enabled)
+            if (_configManager.Config.ShowEvents)
+            {
+                EventsBorder.Visibility = Visibility.Visible;
+                _eventPollTimer.Start();
+                OnEventPollTick(this, EventArgs.Empty);
+            }
+            else
+            {
+                EventsBorder.Visibility = Visibility.Collapsed;
+            }
 
             UpdateGameStatus();
             UpdateScanStatusWithHotkey();
@@ -140,13 +183,25 @@ public partial class OverlayWindow : Window, IDisposable
     {
         if (_hotkeyManager == null || _configManager == null) return;
 
-        // Unregister existing hotkey first
+        // Unregister existing hotkeys first
         _hotkeyManager.UnregisterHotkey(HotkeyManager.SCAN_HOTKEY_ID);
+        _hotkeyManager.UnregisterHotkey(HotkeyManager.EVENTS_TOGGLE_HOTKEY_ID);
+        _hotkeyManager.UnregisterHotkey(HotkeyManager.OVERLAY_TOGGLE_HOTKEY_ID);
 
-        // Register with configured values
+        // Register scan hotkey
         var modifiers = _configManager.Config.ScanModifierKeys;
         var key = _configManager.Config.ScanKey;
         _hotkeyManager.RegisterHotkey(HotkeyManager.SCAN_HOTKEY_ID, modifiers, key);
+
+        // Register events toggle hotkey (F8 by default)
+        var eventsModifiers = _configManager.Config.EventsToggleModifierKeys;
+        var eventsKey = _configManager.Config.EventsToggleKey;
+        _hotkeyManager.RegisterHotkey(HotkeyManager.EVENTS_TOGGLE_HOTKEY_ID, eventsModifiers, eventsKey);
+
+        // Register overlay toggle hotkey (F7 by default)
+        var overlayModifiers = _configManager.Config.OverlayToggleModifierKeys;
+        var overlayKey = _configManager.Config.OverlayToggleKey;
+        _hotkeyManager.RegisterHotkey(HotkeyManager.OVERLAY_TOGGLE_HOTKEY_ID, overlayModifiers, overlayKey);
     }
 
     public string GetScanHotkeyDisplayString()
@@ -554,6 +609,68 @@ public partial class OverlayWindow : Window, IDisposable
         {
             ScanItem();
         }
+        else if (hotkeyId == HotkeyManager.EVENTS_TOGGLE_HOTKEY_ID)
+        {
+            ToggleEventsVisibility();
+        }
+        else if (hotkeyId == HotkeyManager.OVERLAY_TOGGLE_HOTKEY_ID)
+        {
+            ToggleOverlayVisibility();
+        }
+    }
+
+    private void ToggleOverlayVisibility()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (Visibility == Visibility.Visible)
+            {
+                Hide();
+                // Stop polling when hidden to save resources
+                _eventPollTimer.Stop();
+            }
+            else
+            {
+                Show();
+                // Resume polling if events are enabled
+                if (_configManager?.Config.ShowEvents == true)
+                {
+                    _eventPollTimer.Start();
+                    OnEventPollTick(this, EventArgs.Empty);
+                }
+            }
+        });
+    }
+
+    private void ToggleEventsVisibility()
+    {
+        if (_configManager == null) return;
+
+        Dispatcher.Invoke(() =>
+        {
+            // Toggle visibility
+            _configManager.Config.ShowEvents = !_configManager.Config.ShowEvents;
+            var isVisible = _configManager.Config.ShowEvents;
+
+            // Update UI
+            EventsBorder.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+            ActiveEventBorder.Visibility = isVisible && ActiveEventBorder.Visibility == Visibility.Visible
+                ? Visibility.Visible : Visibility.Collapsed;
+
+            // Start/stop API polling based on visibility
+            if (isVisible)
+            {
+                _eventPollTimer.Start();
+                OnEventPollTick(this, EventArgs.Empty); // Immediate refresh
+            }
+            else
+            {
+                _eventPollTimer.Stop();
+            }
+
+            // Save preference
+            _configManager.Save();
+        });
     }
 
     private void ScanItem()

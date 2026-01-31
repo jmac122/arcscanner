@@ -65,35 +65,24 @@
         <TextBlock Grid.Row="0" Text="Overlay Settings" FontSize="20" FontWeight="Bold"
                    Margin="0,0,0,20"/>
 
-        <!-- Events Region -->
-        <GroupBox Grid.Row="1" Header="Events Region" Foreground="White"
+        <!-- Events Settings -->
+        <GroupBox Grid.Row="1" Header="Events Settings" Foreground="White"
                   BorderBrush="#555555" Margin="0,0,0,15">
-            <Grid Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <StackPanel Margin="10">
+                <CheckBox x:Name="ShowEvents" Content="Show events panel on overlay"
+                          Margin="0,0,0,5"/>
+                <TextBlock Text="Toggle with F8 hotkey. Disabling stops API polling to save bandwidth."
+                           Foreground="#888888" FontSize="10" Margin="20,0,0,10"/>
 
-                <TextBlock Text="X:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-                <TextBox x:Name="EventsX" Grid.Column="1" Margin="0,0,10,5"/>
-                <TextBlock Grid.Column="2" Text="Y:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-                <TextBox x:Name="EventsY" Grid.Column="3" Margin="0,0,0,5"/>
+                <CheckBox x:Name="EventsCompactMode" Content="Compact mode (show summary only)"
+                          Margin="0,0,0,5"/>
+                <TextBlock Text="Shows event count and next event instead of full list"
+                           Foreground="#888888" FontSize="10" Margin="20,0,0,10"/>
 
-                <TextBlock Grid.Row="1" Text="Width:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-                <TextBox x:Name="EventsWidth" Grid.Row="1" Grid.Column="1" Margin="0,0,10,5"/>
-                <TextBlock Grid.Row="1" Grid.Column="2" Text="Height:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-                <TextBox x:Name="EventsHeight" Grid.Row="1" Grid.Column="3" Margin="0,0,0,5"/>
-
-                <Button Grid.Row="2" Grid.ColumnSpan="4" Content="Calibrate Events Region"
-                        Click="CalibrateEvents_Click" Margin="0,10,0,0"/>
-            </Grid>
+                <TextBlock Text="Hotkeys:" Margin="0,5,0,5" FontWeight="SemiBold"/>
+                <TextBlock Text="• F7 - Toggle entire overlay visibility" Foreground="#AAAAAA" Margin="10,0,0,2"/>
+                <TextBlock Text="• F8 - Toggle events panel" Foreground="#AAAAAA" Margin="10,0,0,2"/>
+            </StackPanel>
         </GroupBox>
 
         <!-- Item Scanner Settings -->

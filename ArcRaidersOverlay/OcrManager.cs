@@ -8,9 +8,6 @@ namespace ArcRaidersOverlay;
 
 public class OcrManager : IDisposable
 {
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern bool SetDllDirectory(string lpPathName);
-
     private readonly TesseractEngine _engine;
     private bool _disposed;
 
@@ -30,18 +27,6 @@ public class OcrManager : IDisposable
             throw new FileNotFoundException(
                 $"eng.traineddata not found in {tessdataPath}. " +
                 "Download from https://github.com/tesseract-ocr/tessdata_best");
-        }
-
-        // Set DLL search path for native Tesseract libraries
-        // This is needed for single-file published apps where Assembly.Location is empty
-        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        var nativeDir = Environment.Is64BitProcess
-            ? Path.Combine(baseDir, "x64")
-            : Path.Combine(baseDir, "x86");
-
-        if (Directory.Exists(nativeDir))
-        {
-            SetDllDirectory(nativeDir);
         }
 
         _engine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default);

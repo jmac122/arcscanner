@@ -176,7 +176,7 @@ public static class EventParser
     /// Detects the current map from text (location names, map markers, etc.)
     /// Returns the map info if found, null otherwise.
     /// </summary>
-    public static MapInfo? DetectMapInfo(string text)
+    private static MapInfo? DetectMapInfo(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return null;
@@ -185,23 +185,29 @@ public static class EventParser
 
         foreach (var map in KnownMaps)
         {
+            var mapName = map.Name;
+
             // Check for exact name match
-            if (normalized.Contains(map.Name.ToLowerInvariant()))
+            if (!string.IsNullOrWhiteSpace(mapName) && normalized.Contains(mapName.ToLowerInvariant()))
             {
                 return map;
             }
 
             // Check for alias match
-            if (map.Aliases.Any(alias => normalized.Contains(alias.ToLowerInvariant())))
+            if (map.Aliases?.Any(alias => !string.IsNullOrWhiteSpace(alias)
+                && normalized.Contains(alias.ToLowerInvariant())) == true)
             {
                 return map;
             }
 
             // Check for fuzzy match (all words in map name present)
-            var mapWords = map.Name.ToLowerInvariant().Split(' ');
-            if (mapWords.All(word => normalized.Contains(word)))
+            if (!string.IsNullOrWhiteSpace(mapName))
             {
-                return map;
+                var mapWords = mapName.ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (mapWords.Length > 0 && mapWords.All(word => normalized.Contains(word)))
+                {
+                    return map;
+                }
             }
         }
 

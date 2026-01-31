@@ -56,6 +56,7 @@ ehthumbs.db
 
 # Publish output
 publish/
+publish-*/
 
 # Local config
 local.settings.json

@@ -32,6 +32,10 @@
     <None Update="Data\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- Exclude large map images from build output -->
+    <None Remove="Data\maps\*.png" />
+    <None Remove="Data\maps\*.jpg" />
+    <None Remove="Data\maps\*.webp" />
   </ItemGroup>
 
   <ItemGroup>

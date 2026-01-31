@@ -85,7 +85,7 @@ dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
 **Output location:** `bin/Release/net8.0-windows/win-x64/publish/`
 
-The published EXE is self-contained (~60-80 MB) and includes the .NET runtime, so users don't need to install .NET separately.
+The published EXE is self-contained (~200 MB) and includes the .NET runtime, so users don't need to install .NET separately.
 
 The `Data` folder is automatically copied to the output directory during build.
 
@@ -126,6 +126,9 @@ The item scanner uses **cursor-based detection** by default - it captures the ar
 | **Start minimized** | Start minimized to system tray | Off |
 | **Event Poll Interval** | How often to scan for events (seconds) | 15 |
 | **Item Scan Hotkey** | Modifier keys + key to trigger item scan | Ctrl+Shift+S |
+| **Scan at cursor position** | Capture area around mouse cursor instead of fixed region | On |
+| **Scan Region Width** | Width of capture area when using cursor scanning | 500 |
+| **Scan Region Height** | Height of capture area when using cursor scanning | 300 |
 | **Tessdata Path** | Location of Tesseract language files | ./Data/tessdata |
 
 ## Usage
@@ -163,7 +166,7 @@ Right-click the system tray icon:
 
 ### Reading Item Tooltips
 
-When you scan an item with `Shift+S`, the tooltip shows:
+When you scan an item with the hotkey (`Ctrl+Shift+S` by default), the tooltip shows:
 
 ```
 ┌─────────────────────────────┐
@@ -220,7 +223,10 @@ Settings are stored in `%AppData%/ArcRaidersOverlay/config.json`
   "StartWithWindows": false,
   "StartMinimized": false,
   "ScanHotkeyModifier": "Control,Shift",
-  "ScanHotkeyKey": "S"
+  "ScanHotkeyKey": "S",
+  "UseCursorBasedScanning": true,
+  "ScanRegionWidth": 500,
+  "ScanRegionHeight": 300
 }
 ```
 

@@ -1,31 +1,38 @@
 # Map Images
 
-Place map images in this folder for the minimap display feature.
+This folder contains map configuration and images for a future minimap feature.
+
+**Note:** The minimap feature is currently hidden/disabled in the overlay UI. Map images are stored here for future use when the feature is implemented.
+
+## Current Status
+
+The minimap feature requires:
+1. High-resolution map images for each game map
+2. A way to track player position (not currently available via external means)
+
+Since ARC Raiders doesn't expose player coordinates externally, the minimap would only be useful as a static reference image. The feature is hidden until a practical implementation is determined.
 
 ## File Format
 
 - **Format**: PNG (recommended) or JPG
-- **Naming**: Use lowercase with underscores for spaces
-  - Example: `dread_canyon.png`, `blackstone_quarry.png`
+- **Naming**: Use lowercase with hyphens
+  - Example: `dam-battlegrounds.png`, `buried-city.png`
 
-## Known Maps
+## Map Configuration
 
-The following map names are recognized by the overlay:
+Maps are defined in `maps.json`:
 
-- `dread_canyon.png`
-- `blackstone_quarry.png`
-- `wraith_basin.png`
-- `thornback_ridge.png`
-- `dustfall_expanse.png`
-- `sunken_reach.png`
-- `ironwood_forest.png`
-- `ashland_dunes.png`
-
-## Recommended Resolution
-
-- Minimum: 800x600 pixels
-- Recommended: 1920x1080 pixels or higher
-- The overlay will scale images to fit the minimap display area
+```json
+{
+  "maps": [
+    {
+      "id": "dam-battlegrounds",
+      "name": "Dam Battlegrounds",
+      "imageFile": "dam-battlegrounds.png"
+    }
+  ]
+}
+```
 
 ## Creating Map Images
 
@@ -34,7 +41,8 @@ The following map names are recognized by the overlay:
 3. Save with the correct filename
 4. Place in this folder
 
-## POI Overlays (Future Feature)
+## Recommended Resolution
 
-A future update may support POI overlay files:
-- `mapname_poi.json` - Contains POI coordinates and types
+- Minimum: 800x600 pixels
+- Recommended: 1920x1080 pixels or higher
+- The overlay will scale images to fit the display area

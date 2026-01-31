@@ -720,8 +720,13 @@ public partial class OverlayWindow : Window, IDisposable
             var config = _configManager.Config;
             System.Drawing.Bitmap bitmap;
 
+            // Get cursor position for logging
+            var cursorPos = System.Windows.Forms.Cursor.Position;
+            Log($"Scan triggered - Cursor at ({cursorPos.X}, {cursorPos.Y})");
+
             if (config.UseCursorBasedScanning)
             {
+                Log($"Capturing {config.ScanRegionWidth}x{config.ScanRegionHeight} region centered on cursor");
                 // Capture region centered on current cursor position
                 bitmap = _screenCapture.CaptureAtCursor(
                     config.ScanRegionWidth,
@@ -746,7 +751,24 @@ public partial class OverlayWindow : Window, IDisposable
 
             using (bitmap)
             {
+                Log($"Captured bitmap: {bitmap.Width}x{bitmap.Height}");
+
+                // Save debug image
+                try
+                {
+                    var debugDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug");
+                    Directory.CreateDirectory(debugDir);
+                    var debugPath = Path.Combine(debugDir, $"scan_{DateTime.Now:HHmmss}.png");
+                    bitmap.Save(debugPath, System.Drawing.Imaging.ImageFormat.Png);
+                    Log($"Debug image saved: {debugPath}");
+                }
+                catch (Exception saveEx)
+                {
+                    Log($"Failed to save debug image: {saveEx.Message}");
+                }
+
                 var text = _ocrManager.Recognize(bitmap);
+                Log($"OCR result: '{text?.Replace("\n", "\\n") ?? "(null)"}'");
 
                 if (string.IsNullOrWhiteSpace(text))
                 {
@@ -757,6 +779,7 @@ public partial class OverlayWindow : Window, IDisposable
 
                 // Extract item name (first line typically)
                 var itemName = text.Split('\n')[0].Trim();
+                Log($"Extracted item name: '{itemName}'");
                 var item = _dataManager.GetItem(itemName);
 
                 if (item != null)
@@ -764,17 +787,20 @@ public partial class OverlayWindow : Window, IDisposable
                     ShowItemTooltip(item);
                     UpdateScanStatus($"Found: {item.Name}");
                     UpdateLastScannedItem(item.Name);
+                    Log($"Item found in database: {item.Name}");
                 }
                 else
                 {
                     UpdateScanStatus($"Unknown item: {itemName}");
                     HideTooltip();
+                    Log($"Item not found in database");
                 }
             }
         }
         catch (Exception ex)
         {
             UpdateScanStatus($"Scan error: {ex.Message}");
+            Log($"ERROR: Scan failed: {ex}");
         }
     }
 

@@ -68,8 +68,7 @@ ArcRaidersOverlay/Data/maps/*.png
 ArcRaidersOverlay/Data/maps/*.jpg
 !ArcRaidersOverlay/Data/maps/README.md
 
-# App icon (optional)
-ArcRaidersOverlay/app.ico
+# App icon is now tracked (not ignored)
 .vscode/launch.json
 .vscode/tasks.json
 **/*.zip

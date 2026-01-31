@@ -281,19 +281,6 @@ public class GameWindowDetector : IDisposable
     }
 
     /// <summary>
-    /// Converts screen coordinates to game-relative coordinates.
-    /// </summary>
-    public System.Drawing.Point ScreenToGameRelative(System.Drawing.Point screenPoint)
-    {
-        if (CurrentWindow == null)
-            return screenPoint;
-
-        return new System.Drawing.Point(
-            screenPoint.X - CurrentWindow.Bounds.X,
-            screenPoint.Y - CurrentWindow.Bounds.Y);
-    }
-
-    /// <summary>
     /// Converts game-relative coordinates to screen coordinates.
     /// </summary>
     public System.Drawing.Point GameRelativeToScreen(System.Drawing.Point relativePoint)
@@ -375,11 +362,6 @@ public class GameWindowInfo
     /// <summary>Scale factor (1.0 = 100%, 1.5 = 150%, 2.0 = 200%).</summary>
     public double ScaleFactor { get; init; }
 
-    /// <summary>Whether the game is running in fullscreen (covers entire monitor).</summary>
-    public bool IsFullscreen => Bounds.Width >= MonitorBounds.Width && Bounds.Height >= MonitorBounds.Height;
-
-    /// <summary>Whether the game is running in borderless windowed mode.</summary>
-    public bool IsBorderlessWindowed => Bounds == MonitorBounds;
 }
 
 /// <summary>

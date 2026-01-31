@@ -25,7 +25,6 @@ public class HotkeyManager : IDisposable
     #endregion
 
     public const int SCAN_HOTKEY_ID = 9001;
-    public const int TOGGLE_HOTKEY_ID = 9002;
 
     private readonly IntPtr _hwnd;
     private readonly List<int> _registeredHotkeys = new();

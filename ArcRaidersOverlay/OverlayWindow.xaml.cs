@@ -77,6 +77,8 @@ public partial class OverlayWindow : Window, IDisposable
         try
         {
             _configManager = new ConfigManager();
+            ApplyEventPollInterval();
+            ApplyStartMinimized();
             _dataManager = new DataManager();
             _screenCapture = new ScreenCapture();
 
@@ -161,6 +163,25 @@ public partial class OverlayWindow : Window, IDisposable
 
         SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
         _isClickThrough = enable;
+    }
+
+    private void ApplyEventPollInterval()
+    {
+        if (_configManager == null) return;
+
+        var intervalSeconds = _configManager.Config.EventPollIntervalSeconds;
+        if (intervalSeconds > 0)
+        {
+            _eventPollTimer.Interval = TimeSpan.FromSeconds(intervalSeconds);
+        }
+    }
+
+    private void ApplyStartMinimized()
+    {
+        if (_configManager?.Config.StartMinimized == true)
+        {
+            Hide();
+        }
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -744,6 +765,7 @@ public partial class OverlayWindow : Window, IDisposable
         }
 
         // Refresh with new settings
+        ApplyEventPollInterval();
         OnEventPollTick(this, EventArgs.Empty);
     }
 

@@ -161,7 +161,8 @@ public partial class SettingsWindow : Window
             config.OverlayOffsetY = int.Parse(OverlayOffsetY.Text);
 
             // General settings
-            config.StartWithWindows = StartWithWindows.IsChecked ?? false;
+            var startWithWindows = StartWithWindows.IsChecked ?? false;
+            config.StartWithWindows = startWithWindows;
             config.StartMinimized = StartMinimized.IsChecked ?? false;
             config.EventPollIntervalSeconds = int.Parse(PollInterval.Text);
 
@@ -169,7 +170,10 @@ public partial class SettingsWindow : Window
             config.TessdataPath = TessdataPath.Text;
 
             // Handle startup with Windows
-            SetStartupWithWindows(config.StartWithWindows);
+            if (!SetStartupWithWindows(startWithWindows) && startWithWindows)
+            {
+                config.StartWithWindows = false;
+            }
 
             _configManager.Save();
 
@@ -188,23 +192,30 @@ public partial class SettingsWindow : Window
         }
     }
 
-    private static void SetStartupWithWindows(bool enable)
+    private static bool SetStartupWithWindows(bool enable)
     {
         const string keyName = "ArcRaidersOverlay";
-        var exePath = Environment.ProcessPath ?? "";
+        var exePath = Environment.ProcessPath;
 
         using var key = Registry.CurrentUser.OpenSubKey(
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
 
-        if (key == null) return;
+        if (key == null) return false;
 
         if (enable)
         {
+            if (string.IsNullOrWhiteSpace(exePath))
+            {
+                MessageBox.Show("Unable to determine the application path to add startup entry.",
+                    "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
             key.SetValue(keyName, $"\"{exePath}\"");
+            return true;
         }
-        else
-        {
-            key.DeleteValue(keyName, false);
-        }
+
+        key.DeleteValue(keyName, false);
+        return true;
     }
 }

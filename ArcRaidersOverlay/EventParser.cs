@@ -189,11 +189,6 @@ public static class EventParser
     }
 
     /// <summary>
-    /// Gets the list of known maps (for UI display, etc.)
-    /// </summary>
-    public static IReadOnlyList<MapInfo> GetKnownMaps() => KnownMaps.AsReadOnly();
-
-    /// <summary>
     /// Cleans OCR text by fixing common recognition errors.
     /// </summary>
     private static string CleanText(string text)

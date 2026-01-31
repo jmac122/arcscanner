@@ -164,23 +164,4 @@ public class DataManager
         return d[n, m];
     }
 
-    /// <summary>
-    /// Gets all items in the database.
-    /// </summary>
-    public IEnumerable<Item> GetAllItems() => _items.Values.Distinct();
-
-    /// <summary>
-    /// Searches items by partial name match.
-    /// </summary>
-    public IEnumerable<Item> SearchItems(string query)
-    {
-        if (string.IsNullOrWhiteSpace(query)) return Enumerable.Empty<Item>();
-
-        var normalized = NormalizeName(query);
-
-        return _items.Values
-            .Distinct()
-            .Where(i => NormalizeName(i.Name).Contains(normalized))
-            .OrderBy(i => i.Name);
-    }
 }

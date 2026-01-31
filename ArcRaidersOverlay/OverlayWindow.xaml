@@ -8,204 +8,295 @@
         Topmost="True"
         ShowInTaskbar="False"
         Left="10" Top="10"
-        Width="320" Height="500"
+        Width="340" Height="520"
         ResizeMode="NoResize">
 
-    <Grid Margin="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Window.Resources>
+        <!-- Polished button style -->
+        <Style x:Key="PolishedButton" TargetType="Button">
+            <Setter Property="Background" Value="#33FFFFFF"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#44FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#22FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
-        <!-- Title Bar (Draggable Area) -->
-        <Border Grid.Row="0" Background="#99000000" CornerRadius="5" Padding="8" Margin="0,0,0,5"
-                MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-            <Grid>
+    <Border Background="#EE121417" CornerRadius="8" BorderBrush="#33444444" BorderThickness="1">
+        <Grid Margin="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title Bar (Draggable Area) -->
+            <Grid Grid.Row="0" Margin="0,0,0,12" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="ARC Raiders Overlay"
                            Style="{StaticResource HeaderTextStyle}"
+                           FontSize="13" FontWeight="SemiBold"
+                           Foreground="#FFFFFF"
                            VerticalAlignment="Center"/>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button x:Name="LockButton" Content="Lock" Width="45" Height="22"
-                            Click="LockButton_Click" Margin="0,0,5,0"
-                            Background="#66444444" Foreground="White" BorderThickness="0"/>
-                    <Button x:Name="MinimizeButton" Content="_" Width="22" Height="22"
+                    <Button x:Name="LockButton" Content="Lock"
+                            Style="{StaticResource PolishedButton}"
+                            Click="LockButton_Click" Margin="0,0,6,0"
+                            FontSize="11"/>
+                    <Button x:Name="MinimizeButton" Content="—"
+                            Style="{StaticResource PolishedButton}"
                             Click="MinimizeButton_Click"
-                            Background="#66444444" Foreground="White" BorderThickness="0"/>
+                            FontSize="11" Padding="6,4"/>
                 </StackPanel>
             </Grid>
-        </Border>
 
-        <!-- Events Panel -->
-        <Border Grid.Row="1" x:Name="EventsBorder" Background="#99000000" CornerRadius="5" Padding="8" Margin="0,0,0,5">
-            <StackPanel>
+            <!-- Events Panel -->
+            <Border Grid.Row="1" x:Name="EventsBorder" Background="#22FFFFFF" CornerRadius="6"
+                    Padding="12" Margin="0,0,0,10">
+                <StackPanel>
+                    <!-- Section Header with indicator -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <Ellipse Width="8" Height="8" Fill="#00D46E" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="ACTIVE NOW"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="#888A8C" LetterSpacing="0.5"/>
+                        <TextBlock x:Name="EventsCompactSummary"
+                                   Style="{StaticResource EventTextStyle}" Foreground="#666666"
+                                   Visibility="Collapsed" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- Events List -->
+                    <StackPanel x:Name="EventsPanel">
+                        <TextBlock Text="Scanning for events..."
+                                   Style="{StaticResource EventTextStyle}"
+                                   Foreground="#666666" FontStyle="Italic"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Active Event Banner -->
+            <Border Grid.Row="2" x:Name="ActiveEventBorder" CornerRadius="6"
+                    Padding="12" Margin="0,0,0,10" Visibility="Collapsed">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#33006633" Offset="0"/>
+                        <GradientStop Color="#1100AA44" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Events" Style="{StaticResource HeaderTextStyle}"/>
-                    <TextBlock x:Name="EventsCompactSummary" Grid.Column="1"
-                               Style="{StaticResource EventTextStyle}" Foreground="#AAAAAA"
-                               Visibility="Collapsed" VerticalAlignment="Center"/>
-                </Grid>
-                <StackPanel x:Name="EventsPanel" Margin="0,5,0,0">
-                    <TextBlock Text="Scanning for events..."
-                               Style="{StaticResource EventTextStyle}"
-                               Foreground="#AAAAAA" FontStyle="Italic"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
-
-        <!-- Active Event Timer -->
-        <Border Grid.Row="2" x:Name="ActiveEventBorder" Background="#99003300" CornerRadius="5"
-                Padding="8" Margin="0,0,0,5" Visibility="Collapsed">
-            <StackPanel>
-                <TextBlock Text="Active Event" Style="{StaticResource HeaderTextStyle}"
-                           Foreground="#00FF00" Margin="0,0,0,3"/>
-                <TextBlock x:Name="ActiveEventText" Style="{StaticResource EventTextStyle}"
-                           Foreground="#88FF88"/>
-                <TextBlock x:Name="ActiveEventTimer" Style="{StaticResource HeaderTextStyle}"
-                           Foreground="#00FF00" FontSize="18"/>
-            </StackPanel>
-        </Border>
-
-        <!-- Minimap - Hidden until map images are added -->
-        <Border Grid.Row="3" Background="#99000000" CornerRadius="5" Padding="8" Margin="0,0,0,5"
-                Visibility="Collapsed">
-            <StackPanel>
-                <Grid Margin="0,0,0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Minimap" Style="{StaticResource HeaderTextStyle}"/>
-                    <TextBlock x:Name="CurrentMapText" Grid.Column="1"
-                               Style="{StaticResource OverlayTextStyle}"
-                               Foreground="#AAAAAA" FontSize="10"/>
-                </Grid>
-                <Border Background="#66222222" CornerRadius="3" Padding="2">
-                    <Image x:Name="MinimapImage" Width="280" Height="180"
-                           Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
-                </Border>
-                <!-- POI Legend -->
-                <StackPanel x:Name="POILegend" Orientation="Horizontal" Margin="0,5,0,0">
-                    <Ellipse Width="8" Height="8" Fill="#FF4444" Margin="0,0,3,0"/>
-                    <TextBlock Text="Extract" Foreground="#AAAAAA" FontSize="9" Margin="0,0,10,0"/>
-                    <Ellipse Width="8" Height="8" Fill="#44FF44" Margin="0,0,3,0"/>
-                    <TextBlock Text="Loot" Foreground="#AAAAAA" FontSize="9" Margin="0,0,10,0"/>
-                    <Ellipse Width="8" Height="8" Fill="#4444FF" Margin="0,0,3,0"/>
-                    <TextBlock Text="Event" Foreground="#AAAAAA" FontSize="9"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
-
-        <!-- Scan Status -->
-        <Border Grid.Row="4" Background="#99000000" CornerRadius="5" Padding="8" Margin="0,0,0,5">
-            <StackPanel>
-                <TextBlock Text="Item Scanner" Style="{StaticResource HeaderTextStyle}" Margin="0,0,0,3"/>
-                <TextBlock x:Name="ScanStatusText" Style="{StaticResource EventTextStyle}"
-                           Text="Press [Shift+S] to scan item" Foreground="#AAAAAA"/>
-                <TextBlock x:Name="LastScannedItem" Style="{StaticResource EventTextStyle}"
-                           Foreground="#FFCC00" Visibility="Collapsed"/>
-            </StackPanel>
-        </Border>
-
-        <!-- Item Tooltip Panel -->
-        <Border Grid.Row="5" x:Name="TooltipPanel" Background="#DD1a1a1a" CornerRadius="5"
-                Padding="10" Visibility="Collapsed" BorderBrush="#555555" BorderThickness="1">
-            <StackPanel>
-                <!-- Recommendation Banner -->
-                <Border x:Name="TooltipRecommendationBorder" CornerRadius="3" Padding="8,4"
-                        Margin="0,0,0,8" Background="#2288FF88">
-                    <TextBlock x:Name="TooltipRecommendation"
-                               Style="{StaticResource TooltipTextStyle}"
-                               FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
-                </Border>
-
-                <!-- Item Name -->
-                <TextBlock x:Name="TooltipItemName" Style="{StaticResource HeaderTextStyle}"
-                           FontSize="14" Foreground="#FFCC00" Margin="0,0,0,5"/>
-
-                <!-- Item Category/Rarity -->
-                <TextBlock x:Name="TooltipItemCategory" Style="{StaticResource TooltipTextStyle}"
-                           Foreground="#AAAAAA" FontSize="10" Margin="0,0,0,8"/>
-
-                <!-- Quest Item Warning -->
-                <Border x:Name="TooltipQuestWarning" CornerRadius="3" Padding="5"
-                        Margin="0,0,0,5" Background="#44FF8800" Visibility="Collapsed">
-                    <TextBlock x:Name="TooltipQuestText" Style="{StaticResource TooltipTextStyle}"
-                               Foreground="#FFAA00" FontWeight="SemiBold"/>
-                </Border>
-
-                <!-- Value and Recycle % Section -->
-                <Border Background="#33444444" CornerRadius="3" Padding="5" Margin="0,0,0,5">
                     <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Sell Value:" Style="{StaticResource TooltipTextStyle}"/>
-                            <TextBlock x:Name="TooltipValue" Grid.Column="1"
-                                       Style="{StaticResource TooltipTextStyle}"
-                                       Foreground="#88FF88" FontWeight="SemiBold"/>
-                        </Grid>
-                        <Grid x:Name="TooltipRecyclePercentRow" Margin="0,3,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Recycle Efficiency:" Style="{StaticResource TooltipTextStyle}"/>
-                            <TextBlock x:Name="TooltipRecyclePercent" Grid.Column="1"
-                                       Style="{StaticResource TooltipTextStyle}" FontWeight="SemiBold"/>
-                        </Grid>
+                        <TextBlock Text="Active Event" FontSize="10" Foreground="#00D46E"
+                                   FontWeight="SemiBold" Margin="0,0,0,2"/>
+                        <TextBlock x:Name="ActiveEventText" Style="{StaticResource EventTextStyle}"
+                                   Foreground="#CCCCCC" FontSize="12"/>
                     </StackPanel>
-                </Border>
+                    <TextBlock x:Name="ActiveEventTimer" Grid.Column="1"
+                               Style="{StaticResource HeaderTextStyle}"
+                               Foreground="#00D46E" FontSize="18" FontWeight="Bold"
+                               VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
 
-                <!-- Workshop Uses -->
-                <StackPanel x:Name="TooltipWorkshopSection" Margin="0,0,0,5">
-                    <TextBlock Text="Workshop Uses:" Style="{StaticResource TooltipTextStyle}"
-                               Foreground="#AAAAAA" Margin="0,0,0,3"/>
-                    <Border Background="#33444444" CornerRadius="3" Padding="5">
-                        <StackPanel x:Name="TooltipWorkshopUses">
-                            <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
-                                       Foreground="#666666"/>
+            <!-- Minimap - Hidden until map images are added -->
+            <Border Grid.Row="3" Background="#22FFFFFF" CornerRadius="6" Padding="12" Margin="0,0,0,10"
+                    Visibility="Collapsed">
+                <StackPanel>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="MINIMAP" FontSize="11" FontWeight="SemiBold" Foreground="#888A8C"/>
+                        <TextBlock x:Name="CurrentMapText" Grid.Column="1"
+                                   Style="{StaticResource OverlayTextStyle}"
+                                   Foreground="#666666" FontSize="10"/>
+                    </Grid>
+                    <Border Background="#11FFFFFF" CornerRadius="4" Padding="2">
+                        <Image x:Name="MinimapImage" Width="280" Height="180"
+                               Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    </Border>
+                    <!-- POI Legend -->
+                    <StackPanel x:Name="POILegend" Orientation="Horizontal" Margin="0,8,0,0">
+                        <Ellipse Width="8" Height="8" Fill="#FF4444" Margin="0,0,4,0"/>
+                        <TextBlock Text="Extract" Foreground="#888888" FontSize="9" Margin="0,0,12,0"/>
+                        <Ellipse Width="8" Height="8" Fill="#44FF44" Margin="0,0,4,0"/>
+                        <TextBlock Text="Loot" Foreground="#888888" FontSize="9" Margin="0,0,12,0"/>
+                        <Ellipse Width="8" Height="8" Fill="#4444FF" Margin="0,0,4,0"/>
+                        <TextBlock Text="Event" Foreground="#888888" FontSize="9"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Item Scanner Panel -->
+            <Border Grid.Row="4" Background="#22FFFFFF" CornerRadius="6" Padding="12" Margin="0,0,0,10">
+                <StackPanel>
+                    <!-- Scanner Header -->
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="ITEM SCANNER" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="#888A8C" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="ItemCountText" FontSize="10" Foreground="#555555"
+                                       Margin="8,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <!-- Scanner Status Indicator -->
+                        <Border x:Name="ScannerStatusBorder" Grid.Column="1" CornerRadius="10"
+                                Padding="8,3" Background="#2200D46E">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse x:Name="ScannerStatusDot" Width="6" Height="6"
+                                         Fill="#00D46E" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="ScannerStatusLabel" Text="Ready"
+                                           FontSize="10" Foreground="#00D46E" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Scan Status -->
+                    <Border Background="#11FFFFFF" CornerRadius="4" Padding="10" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock x:Name="ScanStatusText" Style="{StaticResource EventTextStyle}"
+                                       Text="Press [Ctrl+Shift+S] to scan item" Foreground="#AAAAAA"/>
+                            <TextBlock x:Name="LastScannedItem" Style="{StaticResource EventTextStyle}"
+                                       Foreground="#FFCC00" Visibility="Collapsed" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
-                </StackPanel>
 
-                <!-- Recycle Outputs -->
-                <StackPanel x:Name="TooltipRecycleSection" Margin="0,0,0,5">
-                    <TextBlock Text="Recycle Outputs:" Style="{StaticResource TooltipTextStyle}"
-                               Foreground="#AAAAAA" Margin="0,0,0,3"/>
-                    <Border Background="#33444444" CornerRadius="3" Padding="5">
-                        <StackPanel x:Name="TooltipRecycleOutputs">
-                            <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
-                                       Foreground="#666666"/>
+                    <!-- Hotkey Hint -->
+                    <TextBlock Text="Hover over item tooltip, then press hotkey"
+                               FontSize="9" Foreground="#555555" TextAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Item Tooltip Panel -->
+            <Border Grid.Row="5" x:Name="TooltipPanel" CornerRadius="6"
+                    Padding="12" Visibility="Collapsed" BorderBrush="#44888888" BorderThickness="1">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#F01a1a1a" Offset="0"/>
+                        <GradientStop Color="#F0141414" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <StackPanel>
+                    <!-- Recommendation Banner -->
+                    <Border x:Name="TooltipRecommendationBorder" CornerRadius="4" Padding="10,6"
+                            Margin="0,0,0,10" Background="#2288FF88">
+                        <TextBlock x:Name="TooltipRecommendation"
+                                   Style="{StaticResource TooltipTextStyle}"
+                                   FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                    </Border>
+
+                    <!-- Item Name -->
+                    <TextBlock x:Name="TooltipItemName" Style="{StaticResource HeaderTextStyle}"
+                               FontSize="15" Foreground="#FFCC00" Margin="0,0,0,3" FontWeight="SemiBold"/>
+
+                    <!-- Item Category/Rarity -->
+                    <TextBlock x:Name="TooltipItemCategory" Style="{StaticResource TooltipTextStyle}"
+                               Foreground="#777777" FontSize="10" Margin="0,0,0,10"/>
+
+                    <!-- Quest Item Warning -->
+                    <Border x:Name="TooltipQuestWarning" CornerRadius="4" Padding="8"
+                            Margin="0,0,0,8" Background="#33FF8800" Visibility="Collapsed"
+                            BorderBrush="#55FF8800" BorderThickness="1">
+                        <TextBlock x:Name="TooltipQuestText" Style="{StaticResource TooltipTextStyle}"
+                                   Foreground="#FFAA00" FontWeight="SemiBold" FontSize="11"/>
+                    </Border>
+
+                    <!-- Value and Recycle % Section -->
+                    <Border Background="#22FFFFFF" CornerRadius="4" Padding="10" Margin="0,0,0,8">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Sell Value" Style="{StaticResource TooltipTextStyle}"
+                                           Foreground="#888888"/>
+                                <TextBlock x:Name="TooltipValue" Grid.Column="1"
+                                           Style="{StaticResource TooltipTextStyle}"
+                                           Foreground="#88FF88" FontWeight="SemiBold"/>
+                            </Grid>
+                            <Grid x:Name="TooltipRecyclePercentRow" Margin="0,6,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Recycle Efficiency" Style="{StaticResource TooltipTextStyle}"
+                                           Foreground="#888888"/>
+                                <TextBlock x:Name="TooltipRecyclePercent" Grid.Column="1"
+                                           Style="{StaticResource TooltipTextStyle}" FontWeight="SemiBold"/>
+                            </Grid>
                         </StackPanel>
                     </Border>
-                </StackPanel>
 
-                <!-- Project Uses -->
-                <StackPanel x:Name="TooltipProjectSection">
-                    <TextBlock Text="Used In Projects:" Style="{StaticResource TooltipTextStyle}"
-                               Foreground="#AAAAAA" Margin="0,0,0,3"/>
-                    <Border Background="#33444444" CornerRadius="3" Padding="5">
-                        <StackPanel x:Name="TooltipProjectUses">
-                            <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
-                                       Foreground="#666666"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- Workshop Uses -->
+                    <StackPanel x:Name="TooltipWorkshopSection" Margin="0,0,0,8">
+                        <TextBlock Text="WORKSHOP USES" Style="{StaticResource TooltipTextStyle}"
+                                   Foreground="#666666" FontSize="9" Margin="0,0,0,4" FontWeight="SemiBold"/>
+                        <Border Background="#11FFFFFF" CornerRadius="4" Padding="8">
+                            <StackPanel x:Name="TooltipWorkshopUses">
+                                <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
+                                           Foreground="#444444"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Recycle Outputs -->
+                    <StackPanel x:Name="TooltipRecycleSection" Margin="0,0,0,8">
+                        <TextBlock Text="RECYCLE OUTPUTS" Style="{StaticResource TooltipTextStyle}"
+                                   Foreground="#666666" FontSize="9" Margin="0,0,0,4" FontWeight="SemiBold"/>
+                        <Border Background="#11FFFFFF" CornerRadius="4" Padding="8">
+                            <StackPanel x:Name="TooltipRecycleOutputs">
+                                <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
+                                           Foreground="#444444"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Project Uses -->
+                    <StackPanel x:Name="TooltipProjectSection">
+                        <TextBlock Text="USED IN PROJECTS" Style="{StaticResource TooltipTextStyle}"
+                                   Foreground="#666666" FontSize="9" Margin="0,0,0,4" FontWeight="SemiBold"/>
+                        <Border Background="#11FFFFFF" CornerRadius="4" Padding="8">
+                            <StackPanel x:Name="TooltipProjectUses">
+                                <TextBlock Text="None" Style="{StaticResource TooltipTextStyle}"
+                                           Foreground="#444444"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
-        </Border>
-    </Grid>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

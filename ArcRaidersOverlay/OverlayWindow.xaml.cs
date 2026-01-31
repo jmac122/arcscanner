@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -248,6 +249,52 @@ public partial class OverlayWindow : Window, IDisposable
     private void UpdateScanStatusWithHotkey()
     {
         UpdateScanStatus($"Press [{GetScanHotkeyDisplayString()}] to scan item");
+        UpdateScannerInfo();
+    }
+
+    private void UpdateScannerInfo()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            // Update item count
+            var itemCount = _dataManager?.ItemCount ?? 0;
+            var iconCount = _iconManager?.IconCount ?? 0;
+
+            if (itemCount > 0 || iconCount > 0)
+            {
+                var parts = new List<string>();
+                if (itemCount > 0) parts.Add($"{itemCount} items");
+                if (iconCount > 0) parts.Add($"{iconCount} icons");
+                ItemCountText.Text = $"({string.Join(", ", parts)})";
+            }
+            else
+            {
+                ItemCountText.Text = "";
+            }
+
+            // Update scanner status indicator
+            var isReady = _ocrManager != null || (_iconManager?.IsReady ?? false);
+            if (isReady)
+            {
+                ScannerStatusBorder.Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromArgb(0x22, 0x00, 0xD4, 0x6E));
+                ScannerStatusDot.Fill = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x00, 0xD4, 0x6E));
+                ScannerStatusLabel.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x00, 0xD4, 0x6E));
+                ScannerStatusLabel.Text = "Ready";
+            }
+            else
+            {
+                ScannerStatusBorder.Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromArgb(0x22, 0xFF, 0x55, 0x55));
+                ScannerStatusDot.Fill = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xFF, 0x55, 0x55));
+                ScannerStatusLabel.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xFF, 0x55, 0x55));
+                ScannerStatusLabel.Text = "Not Ready";
+            }
+        });
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
